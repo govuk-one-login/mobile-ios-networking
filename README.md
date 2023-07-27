@@ -34,7 +34,11 @@ Or for `MockNetworking`:
 
 ## Package description
 
-The main `Networking` Package contains protocols and an empty implementation that can be used to build a Networking client into the app before a concrete implementation is known.
+The main `Networking` Package is a unified implementation for networking to ensure that all HTTP requests made from the app are consistently well-formed. It also ensures that requests are pinned (to Amazon Root Certificates) and a user agent is attached.
+
+Certificate pinning is not recommended in general for mobile applications, given the sensitive nature of our applications, we have decided to add this as an additional layer of protection against man-in-the-middle attacks.
+
+The iOS validation is set-up in the Info.plist for devices which are running iOS 14 or later. The Apple Developer documentation explains how this is set up. There is an additional setup for devices running iOS 13 or lower.
 
 > Within Sources/Networking exist the following protocols and Type for enabling the app to make network requests and pin certificates.
 
@@ -82,7 +86,38 @@ Conforms to: `SecurityEvaluator`
 #### UserAgent
 `UserAgent` is a struct encapsulating helpful additional information to be included in HTTP headers when making network requests.
 
+This enables us to see in our backend logs wiath version of the app is making the call, making it easier for us to triage issues and fix bugs.
+
 Conforms to: `CustomStringConvertible`
+
+You can set various details in the UserAgent, line in the below samples. It will also set the app name from `CFBundleName` and the version from `CFBundleShortVersionString`. We pass these through to a `description` element and then use that with the network call.
+
+```swift
+
+    private var appName: String {
+        guard let appName = retrieveFromInfoDictionary(key: "CFBundleName")?
+            .replacingOccurrences(of: " ", with: "_") else {
+            return "Unknown_name"
+        }
+        return appName
+    }
+    
+    private var appVersion: Version {
+        guard let versionString = retrieveFromInfoDictionary(key: "CFBundleShortVersionString"),
+              let version = Version(string: versionString) else {
+            return .one
+        }
+        return version
+    }
+    
+    private var appInfo: String {
+        "\(appName)/\(appVersion)"
+    }
+    
+    var description: String {
+        "\(appInfo) \(deviceModel) \(osVersion) \(cfNetwork) \(darwin)"
+    }
+```
 
 #### DarwinVersion
 `DarwinVersion` used as part of assembling the `UserAgent` properties. This type gets the `Darwin` version of the current OS from the `utsname` struct.
