@@ -38,7 +38,7 @@ The main `Networking` Package is a unified implementation for networking to ensu
 
 Certificate pinning is not recommended in general for mobile applications, given the sensitive nature of our applications, we have decided to add this as an additional layer of protection against man-in-the-middle attacks.
 
-The iOS validation is set-up in the Info.plist for devices which are running iOS 14 or later. The Apple Developer documentation explains how this is set up. There is an additional setup for devices running iOS 13 or lower.
+The iOS validation is set-up in your app codebase Info.plist for devices which are running iOS 14 or later. The Apple Developer documentation explains how this is set up. There is no additional setup for devices running iOS 13 or lower, as we have included that in this package.
 
 > Within Sources/Networking exist the following protocols and Type for enabling the app to make network requests and pin certificates.
 
@@ -86,7 +86,7 @@ Conforms to: `SecurityEvaluator`
 #### UserAgent
 `UserAgent` is a struct encapsulating helpful additional information to be included in HTTP headers when making network requests.
 
-This enables us to see in our backend logs wiath version of the app is making the call, making it easier for us to triage issues and fix bugs.
+This enables us to see in our backend logs with version of the app is making the call, making it easier for us to triage issues and fix bugs.
 
 Conforms to: `CustomStringConvertible`
 
