@@ -34,7 +34,12 @@ Or for `MockNetworking`:
 
 ## Package description
 
-The main `Networking` Package contains protocols and an empty implementation that can be used to build a Networking client into the app before a concrete implementation is known.
+The main `Networking` Package is a unified implementation for networking to ensure that all HTTP requests made from the app are consistently well-formed. It also ensures that requests are pinned (to Amazon Root Certificates) and a user agent is attached.
+
+Certificate pinning is not recommended in general for mobile applications, given the sensitive nature of our applications, we have decided to add this as an additional layer of protection against man-in-the-middle attacks.
+
+The iOS validation would need to be set-up in your app codebase Info.plist for devices which are running iOS 14 or later. [The Apple Developer documentation](https://developer.apple.com/news/?id=g9ejcf8y) explains how this is set up. There is no additional setup for devices running iOS 13 or lower, as we have included that in this package.
+//add link to documentation
 
 > Within Sources/Networking exist the following protocols and Type for enabling the app to make network requests and pin certificates.
 
@@ -82,7 +87,21 @@ Conforms to: `SecurityEvaluator`
 #### UserAgent
 `UserAgent` is a struct encapsulating helpful additional information to be included in HTTP headers when making network requests.
 
+This enables us to see in our backend logs with version of the app is making the call, making it easier for us to triage issues and fix bugs.
+
 Conforms to: `CustomStringConvertible`
+
+You can set various details in the UserAgent, line in the below samples. It will also set the app name from `CFBundleName` and the version from `CFBundleShortVersionString`. We pass these through to a `description` element and then use that with the network call. For example, for [GOV.UK ID Check](https://apps.apple.com/gb/app/gov-uk-id-check/id1629050566) 1.18.0 running on [iPhone SE 2](https://gist.github.com/adamawolf/3048717) on iOS 16.5.1, this would show up as `ID_Check/1.18.0 iPhone12,8 iOS/16.5.1 CFNetwork/1408.0.4 Darwin/22.5.0`
+
+```swift
+    private var appInfo: String {
+        "\(appName)/\(appVersion)"
+    }
+    
+    var description: String {
+        "\(appInfo) \(deviceModel) \(osVersion) \(cfNetwork) \(darwin)"
+    }
+```
 
 #### DarwinVersion
 `DarwinVersion` used as part of assembling the `UserAgent` properties. This type gets the `Darwin` version of the current OS from the `utsname` struct.
