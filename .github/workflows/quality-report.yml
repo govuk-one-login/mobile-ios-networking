@@ -1,20 +1,15 @@
-name: iOS Pull Request
+name: Run Quality Report
 
 on:
-  pull_request:
-    types: [ opened, reopened, synchronize, ready_for_review ]
+  push:
     branches: [ main ]
-    
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build and Test default scheme using any available iPhone simulator
-    if: github.event.pull_request.draft == false
-    runs-on: macos-13
-
+    name: Run Quality Report
+    runs-on: mobile-ios
+    
     steps:
       - name: Add path globally
         run: echo "/usr/local/bin" >> $GITHUB_PATH
@@ -23,12 +18,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           lfs: 'true'
-          fetch-depth: 0
           
-      - name: Run Linter
-        run: |
-          swiftlint --strict
-            
       - name: Build and Test
         run: |
           xcodebuild -scheme Networking-Package test -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
@@ -44,18 +34,7 @@ jobs:
           
           sonar-scanner \
             -Dsonar.token=$SONAR_TOKEN \
-            -Dsonar.coverageReportPaths="Coverage.xml" \
-            -Dsonar.pullrequest.key=$pull_number \
-            -Dsonar.pullrequest.branch=${{github.head_ref}} \
-            -Dsonar.pullrequest.base=${{github.base_ref}}
+            -Dsonar.coverageReportPaths="Coverage.xml"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Check SonarCloud Results
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        # Force to fail step after specific time
-        timeout-minutes: 5
-        env:
-         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
