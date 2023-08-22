@@ -15,9 +15,9 @@ final class ServerErrorTests: XCTestCase {
     }
     
     func test_ServerError_params() throws {
-        XCTAssertEqual(sut.parameters["endpoint"], "testendpoint")
-        XCTAssertEqual(sut.parameters["code"]?.description, "200")
-        XCTAssertEqual(sut.parameters["reason"], "server")
+        XCTAssertEqual(sut.endpoint, "testendpoint")
+        XCTAssertEqual(sut.errorCode.description, "200")
+        XCTAssertEqual(sut.reason, "server")
         XCTAssertEqual(sut.hash, "83766358f64858b51afb745bbdde91bb")
     }
 }
