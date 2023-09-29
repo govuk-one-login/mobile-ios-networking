@@ -6,11 +6,13 @@ import Foundation
 /// `NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
 public final class NetworkClient {
     private let session: URLSession
+    private let authenticationProvider: AuthenticationProvider?
     private var cancellables: Set<AnyCancellable> = []
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
-    public convenience init() {
-        self.init(configuration: .ephemeral)
+    public convenience init(authenticationProvider: AuthenticationProvider? = nil) {
+        self.init(configuration: .ephemeral,
+                  authenticationProvider: authenticationProvider)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
@@ -20,7 +22,10 @@ public final class NetworkClient {
     ///
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
-    init(configuration: URLSessionConfiguration) {
+    init(configuration: URLSessionConfiguration,
+         authenticationProvider: AuthenticationProvider?) {
+        self.authenticationProvider = authenticationProvider
+        
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
         configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
         #if DEBUG
@@ -47,6 +52,18 @@ public final class NetworkClient {
     /// - Parameters:
     ///   - request: ``URLRequest`` for the network request
     public func makeRequest(_ request: URLRequest) async throws -> Data {
+        if let authenticationProvider {
+            let authorizedRequest = try await request
+                .authorized(with: authenticationProvider.bearerToken)
+            return try await makeAuthorizedRequest(authorizedRequest)
+        } else {
+            return try await makeAuthorizedRequest(request)
+        }
+        
+        
+    }
+    
+    private func makeAuthorizedRequest(_ request: URLRequest) async throws -> Data {
         try await withCheckedThrowingContinuation { continuation in
             makeRequest(request) { response in
                 switch response {
@@ -79,5 +96,14 @@ public final class NetworkClient {
         } receiveValue: {
             completion(.success(($0, $1)))
         }.store(in: &cancellables)
+    }
+}
+
+extension URLRequest {
+    func authorized(with token: String) -> Self {
+        var request = self
+        request.addValue("Bearer \(token)",
+                         forHTTPHeaderField: "Authorization")
+        return request
     }
 }
