@@ -22,6 +22,8 @@ public final class NetworkClient {
     ///
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
+    ///   - authenticationProvider: Provider of bearer token to network request
+    ///
     init(configuration: URLSessionConfiguration,
          authenticationProvider: AuthenticationProvider?) {
         self.authenticationProvider = authenticationProvider
@@ -48,6 +50,7 @@ public final class NetworkClient {
     }
     
     /// `makeRequest` method for making network requests has a single parameter of type `URLRequest` and returns `Data`
+    ///   if network client has been passed authenticationProvider then request will include bearer token in header
     ///
     /// - Parameters:
     ///   - request: ``URLRequest`` for the network request
@@ -96,14 +99,5 @@ public final class NetworkClient {
         } receiveValue: {
             completion(.success(($0, $1)))
         }.store(in: &cancellables)
-    }
-}
-
-extension URLRequest {
-    func authorized(with token: String) -> Self {
-        var request = self
-        request.addValue("Bearer \(token)",
-                         forHTTPHeaderField: "Authorization")
-        return request
     }
 }
