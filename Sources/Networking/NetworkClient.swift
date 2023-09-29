@@ -25,7 +25,7 @@ public final class NetworkClient {
     ///   - authenticationProvider: Provider of bearer token to network request
     ///
     init(configuration: URLSessionConfiguration,
-         authenticationProvider: AuthenticationProvider?) {
+         authenticationProvider: AuthenticationProvider? = nil) {
         self.authenticationProvider = authenticationProvider
         
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
