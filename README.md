@@ -9,7 +9,7 @@ To use Networking in a SwiftPM project:
 1. Add the following line to the dependencies in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/alphagov/di-mobile-ios-networking", from: "1.0.0"),
+.package(url: "https://github.com/govuk-one-login/mobile-ios-networking", from: "1.0.0"),
 ```
 
 2. Add `Networking` as a dependency for your target:
