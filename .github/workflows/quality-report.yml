@@ -41,7 +41,7 @@ jobs:
           
       - name: Increment Version
         id: versioning
-        uses: Oliver-Binns/Versioning@main
+        uses: Oliver-Binns/Versioning@v0
         with:
           ACTION_TYPE: Release
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
