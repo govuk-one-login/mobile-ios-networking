@@ -20,7 +20,7 @@ jobs:
         run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
         with:
           lfs: 'true'
           fetch-depth: 0
