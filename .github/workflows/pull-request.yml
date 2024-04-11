@@ -36,7 +36,7 @@ jobs:
           ACTION_TYPE: 'Validate'
 
       - name: Build and Test
-        run: |+
+        run: |
           xcodebuild -scheme Networking-Package test -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" \
             -enableCodeCoverage YES -resultBundlePath result.xcresult
             
