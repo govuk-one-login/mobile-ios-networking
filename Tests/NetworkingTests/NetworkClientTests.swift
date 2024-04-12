@@ -133,7 +133,7 @@ extension NetworkClientTests {
         XCTAssertEqual(tokenResponse.accessToken, "testAccessToken")
         XCTAssertEqual(tokenResponse.tokenType, "testTokenType")
         XCTAssertEqual(tokenResponse.expiresIn, 123456789)
-    }    
+    }
     
     func test_decodeServiceToken_error() throws {
         let data = """
