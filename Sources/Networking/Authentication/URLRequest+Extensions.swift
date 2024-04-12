@@ -1,8 +1,8 @@
 import Foundation
 
 extension URLRequest {
-    static func tokenExchange(url: URL, subjectToken: String, scope: String) -> Self {
-        var request = URLRequest(url: url)
+    func tokenExchange(subjectToken: String, scope: String) -> Self {
+        var request = self
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         var urlParser = URLComponents()
@@ -13,7 +13,6 @@ extension URLRequest {
             URLQueryItem(name: "subject-token-type", value: "urn:ietf:params:oauth:token-type:access_token")
         ]
         request.httpBody = urlParser.percentEncodedQuery?.data(using: .utf8)
-        
         return request
     }
     
