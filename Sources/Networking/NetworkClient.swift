@@ -1,11 +1,6 @@
 import Combine
 import Foundation
 
-enum NetworkClientError: Error {
-    case authenticationProviderNotPresent
-    case unableToDecodeServiceTokenResponse
-}
-
 /// NetworkClient
 ///
 /// `NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
