@@ -65,7 +65,7 @@ public final class NetworkClient {
         return try await makeRequest(authorizedRequest)
     }
     
-    func exchangeToken(exchangeRequest: URLRequest, scope: String) async throws -> ServiceTokenResponse {
+    private func exchangeToken(exchangeRequest: URLRequest, scope: String) async throws -> ServiceTokenResponse {
         guard let authenticationProvider else {
             assertionFailure("Authentication provider not present")
             throw NetworkClientError.authenticationProviderNotPresent
@@ -77,7 +77,7 @@ public final class NetworkClient {
         return try decodeServiceToken(data: serviceTokenResponse)
     }
     
-    func decodeServiceToken(data: Data) throws -> ServiceTokenResponse {
+    private func decodeServiceToken(data: Data) throws -> ServiceTokenResponse {
         let jsonDecoder = JSONDecoder()
         jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
         do {

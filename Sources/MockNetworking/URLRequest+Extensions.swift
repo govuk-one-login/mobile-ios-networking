@@ -1,7 +1,7 @@
 import Foundation
 
 extension URLRequest {
-    public func bodySteamAsJSON() -> Any? {
+    public func httpBodyData() -> Data? {
         guard let bodyStream = self.httpBodyStream else { return nil }
         
         bodyStream.open()
@@ -18,16 +18,6 @@ extension URLRequest {
         
         buffer.deallocate()
         bodyStream.close()
-        
-        do {
-            return try JSONSerialization.jsonObject(with: data,
-                                                    options: JSONSerialization.ReadingOptions.allowFragments)
-            
-        } catch {
-            #if DEBUG
-            print(error.localizedDescription)
-            #endif
-            return nil
-        }
+        return data
     }
 }
