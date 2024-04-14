@@ -36,7 +36,7 @@ extension NetworkClientTests {
     }
     
     func test_makeRequest_returnsData() async throws {
-        let data = try XCTUnwrap("{ test }".data(using: . utf8))
+        let data = try XCTUnwrap("{ test }".data(using: .utf8))
         
         MockURLProtocol.handler = {
             (data, HTTPURLResponse(statusCode: 200))
@@ -65,8 +65,8 @@ extension NetworkClientTests {
                 "token_type": "testTokenType",
                 "expires_in": 123456789
             }
-        """.data(using: . utf8))
-        let data = try XCTUnwrap("{ test }".data(using: . utf8))
+        """.data(using: .utf8))
+        let data = try XCTUnwrap("{ test }".data(using: .utf8))
         
         var requestsMade = 0
         MockURLProtocol.handler = {
@@ -124,7 +124,7 @@ extension NetworkClientTests {
                 "token_type": "testTokenType",
                 "expires_in": 123456789
             }
-        """.data(using: . utf8))
+        """.data(using: .utf8))
         
         var requestsMade = 0
         MockURLProtocol.handler = {

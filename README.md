@@ -49,13 +49,14 @@ The iOS validation would need to be set-up in your app codebase Info.plist for d
 
 `Device` used to extend `Bundle` to provide an abstraction layer to decouple required properties for use in `UserAgent` struct and in mocks.
 
-`SecurityEvaluator` for handling evaulating server trust and getting certificates
+`SecurityEvaluator` for evaluating server trust and getting certificates
 
 
 ### Types
 
 #### NetworkClient
-`NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`. `NetworkClient` is initialised with a `URLSessionConfiguration`. It has a `convenience init` that initialises `configuration` with the `.ephemeral` singleton on `URLSessionConfiguration` which avoids needing to provide one at initialisation.
+`NetworkClient` is a class with two public async throwing methods called `makeRequest` and `makeAuthorizedRequest` which handle network requests and return `Data`. 
+`NetworkClient` is initialised with a `URLSessionConfiguration`. It has a `convenience init` that initialises `configuration` with the `.ephemeral` singleton on `URLSessionConfiguration` which avoids needing to provide one at initialisation.
 
 For iOS 14 and later, certificates are pinned using `NSAppTransportSecurity`. Earlier versions of iOS use `SSLPinningDelegate` which conforms to `URLSessionDelegate` protocol to handle certificate pinning.
 
@@ -65,8 +66,15 @@ The signature of the `makeRequest` method is:
 public func makeRequest(_ request: URLRequest) async throws -> Data
 ```
 
-`makeRequest` handles various response types and returns or throws errors as appropriate.
+The signature of the `makeAuthorizedRequest` method is:
 
+```swift
+public func makeAuthorizedRequest(exchangeRequest: URLRequest,
+                                  scope: String,
+                                  request: URLRequest) async throws -> Data
+```
+
+Both of these methods handle various response types and return or throw errors as appropriate.
 
 The `URLSessionConfiguration.tlsMinimumSupportedProtocolVersion` is then set to `.TLSv12` and `.httpAdditionalHeaders` is set like so:
 
@@ -75,12 +83,12 @@ configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
 ```
 
 #### SSLPinningDelegate
-`SSLPinningDelegate` class is used for handling certicate pinning in iOS 13 and earlier. In the ``NetworkClient`` initialiser it is called conditionally.
+`SSLPinningDelegate` class is used for handling certificate pinning in iOS 13 and earlier. In the ``NetworkClient`` initialiser it is called conditionally.
 
 Conforms to: `NSObject`, `URLSessionDelegate`
 
 #### X509CertificateSecurityEvaluator
-`X509CertificateSecurityEvaluator` concrete implmentation of `SecurityEvaulator`
+`X509CertificateSecurityEvaluator` concrete implementation of `SecurityEvaulator`
 
 Conforms to: `SecurityEvaluator`
 
@@ -114,7 +122,7 @@ Conforms to: `CustomStringConvertible`
 Conforms to: `CustomStringConvertible`
 
 #### Version 
-`Version` used as part of assembling the `UserAgent` properties. It has two initialisers. The one used when creating the `UserAgent` takes a `String` arguement and separates it into components for `major`, `minor` and `increment` version numbers which are then stored in constant properties. The other initialiser accepts separate `Int` types directly for `major`, `minor` and `increment`.
+`Version` used as part of assembling the `UserAgent` properties. It has two initialisers. The one used when creating the `UserAgent` takes a `String` argument and separates it into components for `major`, `minor` and `increment` version numbers which are then stored in constant properties. The other initialiser accepts separate `Int` types directly for `major`, `minor` and `increment`.
 
 Conforms to: `CustomStringConvertible`, `Decodable` and `Comparable`.
 
@@ -160,7 +168,7 @@ There is then an extension on `ServerError` which adds a `parameters` dictionary
 
 ### How to use the Network Client
 
-To use the `NetworkClient` first make sure your module or app has a dependency on `Networking` and the file has an import for `Networking`. Then initialise an instance of `NetworkClient` and create a URLRequest. Then make the network request using the `makeReqest` method. 
+To use the `NetworkClient` first make sure your module or app has a dependency on `Networking` and the file has an import for `Networking`. Then initialise an instance of `NetworkClient` and create a URLRequest. Then make the network request using the `makeRequest` method. 
 
 ```swift
 import Networking
