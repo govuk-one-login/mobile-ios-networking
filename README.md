@@ -56,6 +56,7 @@ The iOS validation would need to be set-up in your app codebase Info.plist for d
 
 #### NetworkClient
 `NetworkClient` is a class with two public async throwing methods called `makeRequest` and `makeAuthorizedRequest` which handle network requests and return `Data`. 
+
 `NetworkClient` is initialised with a `URLSessionConfiguration`. It has a `convenience init` that initialises `configuration` with the `.ephemeral` singleton on `URLSessionConfiguration` which avoids needing to provide one at initialisation.
 
 For iOS 14 and later, certificates are pinned using `NSAppTransportSecurity`. Earlier versions of iOS use `SSLPinningDelegate` which conforms to `URLSessionDelegate` protocol to handle certificate pinning.

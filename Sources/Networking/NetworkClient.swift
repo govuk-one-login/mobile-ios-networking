@@ -49,13 +49,13 @@ public final class NetworkClient {
         }
     }
     
-    /// `makeAuthorizedRequest` method for making authenticated network requests has three parameters and returns `Data`
+    /// `makeAuthorizedRequest` method for making authorized network requests has three parameters and returns `Data`
     ///  the network client must be initialised with an authenticationProvider else an error is thrown
     ///
     /// - Parameters:
     ///   - exchangeRequest: ``URLRequest`` for the token exchange network request
-    ///   - scope: ``String`` for the scope of the authorized token
-    ///   - request: ``URLRequest`` for the authenticated network request
+    ///   - scope: ``String`` for the scope of the authenticated token
+    ///   - request: ``URLRequest`` for the authorized network request
     /// - Returns: ``Data`` the response data from the endpoint
     public func makeAuthorizedRequest(exchangeRequest: URLRequest,
                                       scope: String,

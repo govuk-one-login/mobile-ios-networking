@@ -36,7 +36,7 @@ extension NetworkClientTests {
     }
     
     func test_makeRequest_returnsData() async throws {
-        let data = try XCTUnwrap("{ test }".data(using: .utf8))
+        let data = try XCTUnwrap("{ testResult }".data(using: .utf8))
         
         MockURLProtocol.handler = {
             (data, HTTPURLResponse(statusCode: 200))
@@ -66,7 +66,7 @@ extension NetworkClientTests {
                 "expires_in": 123456789
             }
         """.data(using: .utf8))
-        let data = try XCTUnwrap("{ test }".data(using: .utf8))
+        let data = try XCTUnwrap("{ testResult }".data(using: .utf8))
         
         var requestsMade = 0
         MockURLProtocol.handler = {
@@ -92,11 +92,11 @@ extension NetworkClientTests {
         XCTAssertEqual(contentType, "application/x-www-form-urlencoded")
         XCTAssertEqual(httpMethod, "POST")
         let bodyData = try XCTUnwrap(firstRequest.httpBodyData())
-        let body = String(data: bodyData, encoding: .utf8)?.split(separator: "&")
-        XCTAssertEqual(body?[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
-        XCTAssertEqual(body?[1], "scope=testScope")
-        XCTAssertEqual(body?[2], "subject-token=testBearerToken")
-        XCTAssertEqual(body?[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
+        let body = try XCTUnwrap(String(data: bodyData, encoding: .utf8)?.split(separator: "&"))
+        XCTAssertEqual(body[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
+        XCTAssertEqual(body[1], "scope=testScope")
+        XCTAssertEqual(body[2], "subject-token=testBearerToken")
+        XCTAssertEqual(body[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
         
         let secondRequest = try XCTUnwrap(MockURLProtocol.requests.last)
         let bearerToken = secondRequest.value(forHTTPHeaderField: "Authorization")

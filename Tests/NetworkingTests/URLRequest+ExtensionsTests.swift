@@ -18,16 +18,16 @@ final class URLRequestTests: XCTestCase {
 extension URLRequestTests {
     func test_tokenExchange() throws {
         let tokenRequest = sut.tokenExchange(subjectToken: "tesSubjectToken", scope: "testScope")
-        let contentTypeHeaer = tokenRequest.value(forHTTPHeaderField: "Content-Type")
+        let contentTypeHeader = tokenRequest.value(forHTTPHeaderField: "Content-Type")
         let httpMethod = tokenRequest.httpMethod
-        let body = String(data: tokenRequest.httpBody!, encoding: .utf8)?.split(separator: "&")
+        let body = try XCTUnwrap(String(data: try XCTUnwrap(tokenRequest.httpBody), encoding: .utf8)?.split(separator: "&"))
         XCTAssertEqual(tokenRequest.url, URL(string: "https://www.google.com"))
-        XCTAssertEqual(contentTypeHeaer, "application/x-www-form-urlencoded")
+        XCTAssertEqual(contentTypeHeader, "application/x-www-form-urlencoded")
         XCTAssertEqual(httpMethod, "POST")
-        XCTAssertEqual(body?[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
-        XCTAssertEqual(body?[1], "scope=testScope")
-        XCTAssertEqual(body?[2], "subject-token=tesSubjectToken")
-        XCTAssertEqual(body?[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
+        XCTAssertEqual(body[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
+        XCTAssertEqual(body[1], "scope=testScope")
+        XCTAssertEqual(body[2], "subject-token=tesSubjectToken")
+        XCTAssertEqual(body[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
     }
     
     func test_authorized() throws {
