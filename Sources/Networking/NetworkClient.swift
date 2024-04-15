@@ -49,24 +49,51 @@ public final class NetworkClient {
         }
     }
     
+    /// `makeAuthorizedRequest` method for making authorized network requests has three parameters and returns `Data`
+    ///  the network client must be initialised with an authenticationProvider else an error is thrown
+    ///
+    /// - Parameters:
+    ///   - exchangeRequest: ``URLRequest`` for the token exchange network request
+    ///   - scope: ``String`` for the scope of the authenticated token
+    ///   - request: ``URLRequest`` for the authorized network request
+    /// - Returns: ``Data`` the response data from the endpoint
+    public func makeAuthorizedRequest(exchangeRequest: URLRequest,
+                                      scope: String,
+                                      request: URLRequest) async throws -> Data {
+        let serviceToken = try await exchangeToken(exchangeRequest: exchangeRequest, scope: scope)
+        let authorizedRequest = request.authorized(with: serviceToken.accessToken)
+        return try await makeRequest(authorizedRequest)
+    }
+    
+    private func exchangeToken(exchangeRequest: URLRequest, scope: String) async throws -> ServiceTokenResponse {
+        guard let authenticationProvider else {
+            assertionFailure("Authentication provider not present")
+            throw NetworkClientError.authenticationProviderNotPresent
+        }
+        let subjectToken = try await authenticationProvider.bearerToken
+        let serviceTokenRequest = exchangeRequest.tokenExchange(subjectToken: subjectToken,
+                                                                scope: scope)
+        let serviceTokenResponse = try await makeRequest(serviceTokenRequest)
+        return try decodeServiceToken(data: serviceTokenResponse)
+    }
+    
+    private func decodeServiceToken(data: Data) throws -> ServiceTokenResponse {
+        let jsonDecoder = JSONDecoder()
+        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        do {
+            return try jsonDecoder.decode(ServiceTokenResponse.self,
+                                          from: data)
+        } catch {
+            throw NetworkClientError.unableToDecodeServiceTokenResponse
+        }
+    }
+    
     /// `makeRequest` method for making network requests has a single parameter of type `URLRequest` and returns `Data`
-    ///   if network client has been passed authenticationProvider then request will include bearer token in header
     ///
     /// - Parameters:
     ///   - request: ``URLRequest`` for the network request
+    /// - Returns: ``Data`` the response data from the endpoint
     public func makeRequest(_ request: URLRequest) async throws -> Data {
-        if let authenticationProvider {
-            let authorizedRequest = try await request
-                .authorized(with: authenticationProvider.bearerToken)
-            return try await makeAuthorizedRequest(authorizedRequest)
-        } else {
-            return try await makeAuthorizedRequest(request)
-        }
-        
-        
-    }
-    
-    private func makeAuthorizedRequest(_ request: URLRequest) async throws -> Data {
         try await withCheckedThrowingContinuation { continuation in
             makeRequest(request) { response in
                 switch response {
