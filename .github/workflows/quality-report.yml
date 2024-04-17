@@ -18,9 +18,13 @@ jobs:
         run: echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # pin@v4
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # pin@v4
         with:
           lfs: 'true'
+
+      - name: Xcode select
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.2.app
 
       - name: Build and Test
         run: |
