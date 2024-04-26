@@ -93,10 +93,10 @@ extension NetworkClientTests {
         XCTAssertEqual(httpMethod, "POST")
         let bodyData = try XCTUnwrap(firstRequest.httpBodyData())
         let body = try XCTUnwrap(String(data: bodyData, encoding: .utf8)?.split(separator: "&"))
-        XCTAssertEqual(body[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
+        XCTAssertEqual(body[0], "grant_type=urn:ietf:params:oauth:grant-type:token-exchange")
         XCTAssertEqual(body[1], "scope=testScope")
-        XCTAssertEqual(body[2], "subject-token=testBearerToken")
-        XCTAssertEqual(body[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
+        XCTAssertEqual(body[2], "subject_token=testBearerToken")
+        XCTAssertEqual(body[3], "subject_token_type=urn:ietf:params:oauth:token-type:access_token")
         
         let secondRequest = try XCTUnwrap(MockURLProtocol.requests.last)
         let bearerToken = secondRequest.value(forHTTPHeaderField: "Authorization")
