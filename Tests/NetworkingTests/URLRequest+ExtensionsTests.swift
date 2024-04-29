@@ -24,10 +24,10 @@ extension URLRequestTests {
         XCTAssertEqual(tokenRequest.url, URL(string: "https://www.google.com"))
         XCTAssertEqual(contentTypeHeader, "application/x-www-form-urlencoded")
         XCTAssertEqual(httpMethod, "POST")
-        XCTAssertEqual(body[0], "grant-type=urn:ietf:params:oauth:grant-type:token-exchange")
+        XCTAssertEqual(body[0], "grant_type=urn:ietf:params:oauth:grant-type:token-exchange")
         XCTAssertEqual(body[1], "scope=testScope")
-        XCTAssertEqual(body[2], "subject-token=tesSubjectToken")
-        XCTAssertEqual(body[3], "subject-token-type=urn:ietf:params:oauth:token-type:access_token")
+        XCTAssertEqual(body[2], "subject_token=tesSubjectToken")
+        XCTAssertEqual(body[3], "subject_token_type=urn:ietf:params:oauth:token-type:access_token")
     }
     
     func test_authorized() throws {
