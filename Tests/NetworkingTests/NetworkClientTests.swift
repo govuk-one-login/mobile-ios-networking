@@ -36,7 +36,7 @@ extension NetworkClientTests {
     }
     
     func test_makeRequest_returnsData() async throws {
-        let data = try XCTUnwrap("{ testResult }".data(using: .utf8))
+        let data = Data("{ testResult }".utf8)
         
         MockURLProtocol.handler = {
             (data, HTTPURLResponse(statusCode: 200))
@@ -59,14 +59,14 @@ extension NetworkClientTests {
     }
     
     func test_makeAuthorizedRequest_returnsData() async throws {
-        let exchangeData = try XCTUnwrap("""
+        let exchangeData = Data("""
             {
                 "access_token": "testAccessToken",
                 "token_type": "testTokenType",
                 "expires_in": 123456789
             }
-        """.data(using: .utf8))
-        let data = try XCTUnwrap("{ testResult }".data(using: .utf8))
+        """.utf8)
+        let data = Data("{ testResult }".utf8)
         
         var requestsMade = 0
         MockURLProtocol.handler = {
@@ -92,7 +92,7 @@ extension NetworkClientTests {
         XCTAssertEqual(contentType, "application/x-www-form-urlencoded")
         XCTAssertEqual(httpMethod, "POST")
         let bodyData = try XCTUnwrap(firstRequest.httpBodyData())
-        let body = try XCTUnwrap(String(data: bodyData, encoding: .utf8)?.split(separator: "&"))
+        let body = String(decoding: bodyData, as: UTF8.self).split(separator: "&")
         XCTAssertEqual(body[0], "grant_type=urn:ietf:params:oauth:grant-type:token-exchange")
         XCTAssertEqual(body[1], "scope=testScope")
         XCTAssertEqual(body[2], "subject_token=testBearerToken")
@@ -118,13 +118,13 @@ extension NetworkClientTests {
     }
     
     func test_makeAuthorizedRequest_secondCall_returnsServerError() async throws {
-        let exchangeData = try XCTUnwrap("""
+        let exchangeData = Data("""
             {
                 "access_token": "testAccessToken",
                 "token_type": "testTokenType",
                 "expires_in": 123456789
             }
-        """.data(using: .utf8))
+        """.utf8)
         
         var requestsMade = 0
         MockURLProtocol.handler = {

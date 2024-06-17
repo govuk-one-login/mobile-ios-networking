@@ -7,16 +7,16 @@ public final class MockURLProtocol: URLProtocol {
     public private(set) static var requests: [URLRequest] = []
     public static var handler: (() throws -> (Data, URLResponse))?
     
-    public class func clear() {
+    public static func clear() {
         requests = []
         handler = nil
     }
     
-    public override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+    public override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         request
     }
     
-    public override class func canInit(with request: URLRequest) -> Bool {
+    public override static func canInit(with request: URLRequest) -> Bool {
         requests.append(request)
         return true
     }

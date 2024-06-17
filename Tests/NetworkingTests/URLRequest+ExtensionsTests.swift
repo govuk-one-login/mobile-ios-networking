@@ -20,7 +20,8 @@ extension URLRequestTests {
         let tokenRequest = sut.tokenExchange(subjectToken: "tesSubjectToken", scope: "testScope")
         let contentTypeHeader = tokenRequest.value(forHTTPHeaderField: "Content-Type")
         let httpMethod = tokenRequest.httpMethod
-        let body = try XCTUnwrap(String(data: try XCTUnwrap(tokenRequest.httpBody), encoding: .utf8)?.split(separator: "&"))
+        let httpBody = try XCTUnwrap(tokenRequest.httpBody)
+        let body = String(decoding: httpBody, as: UTF8.self).split(separator: "&")
         XCTAssertEqual(tokenRequest.url, URL(string: "https://www.google.com"))
         XCTAssertEqual(contentTypeHeader, "application/x-www-form-urlencoded")
         XCTAssertEqual(httpMethod, "POST")
