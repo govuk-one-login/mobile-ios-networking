@@ -5,14 +5,14 @@ import Foundation
 ///
 /// `NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
 public final class NetworkClient {
+    public var authorizationProvider: AuthorizationProvider?
+
     private let session: URLSession
-    private let authenticationProvider: AuthenticationProvider?
     private var cancellables: Set<AnyCancellable> = []
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
-    public convenience init(authenticationProvider: AuthenticationProvider? = nil) {
-        self.init(configuration: .ephemeral,
-                  authenticationProvider: authenticationProvider)
+    public convenience init() {
+        self.init(configuration: .ephemeral)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
@@ -22,17 +22,13 @@ public final class NetworkClient {
     ///
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
-    ///   - authenticationProvider: Provider of bearer token to network request
     ///
-    init(configuration: URLSessionConfiguration,
-         authenticationProvider: AuthenticationProvider? = nil) {
-        self.authenticationProvider = authenticationProvider
-        
+    init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
         configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
-        #if DEBUG
+#if DEBUG
         print(configuration.httpAdditionalHeaders!)
-        #endif
+#endif
         if #available(iOS 14, *) {
             // On iOS 14+, certificate pinning is handled by NSAppTransportSecurity
             // https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity
@@ -40,51 +36,12 @@ public final class NetworkClient {
         } else {
             let queue = OperationQueue()
             queue.underlyingQueue = .global()
-            
+
             let delegate = SSLPinningDelegate()
-            
+
             session = .init(configuration: configuration,
                             delegate: delegate,
                             delegateQueue: queue)
-        }
-    }
-    
-    /// `makeAuthorizedRequest` method for making authorized network requests has three parameters and returns `Data`
-    ///  the network client must be initialised with an authenticationProvider else an error is thrown
-    ///
-    /// - Parameters:
-    ///   - exchangeRequest: ``URLRequest`` for the token exchange network request
-    ///   - scope: ``String`` for the scope of the authenticated token
-    ///   - request: ``URLRequest`` for the authorized network request
-    /// - Returns: ``Data`` the response data from the endpoint
-    public func makeAuthorizedRequest(exchangeRequest: URLRequest,
-                                      scope: String,
-                                      request: URLRequest) async throws -> Data {
-        let serviceToken = try await exchangeToken(exchangeRequest: exchangeRequest, scope: scope)
-        let authorizedRequest = request.authorized(with: serviceToken.accessToken)
-        return try await makeRequest(authorizedRequest)
-    }
-    
-    private func exchangeToken(exchangeRequest: URLRequest, scope: String) async throws -> ServiceTokenResponse {
-        guard let authenticationProvider else {
-            assertionFailure("Authentication provider not present")
-            throw NetworkClientError.authenticationProviderNotPresent
-        }
-        let subjectToken = try await authenticationProvider.bearerToken
-        let serviceTokenRequest = exchangeRequest.tokenExchange(subjectToken: subjectToken,
-                                                                scope: scope)
-        let serviceTokenResponse = try await makeRequest(serviceTokenRequest)
-        return try decodeServiceToken(data: serviceTokenResponse)
-    }
-    
-    private func decodeServiceToken(data: Data) throws -> ServiceTokenResponse {
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        do {
-            return try jsonDecoder.decode(ServiceTokenResponse.self,
-                                          from: data)
-        } catch {
-            throw NetworkClientError.unableToDecodeServiceTokenResponse
         }
     }
     
@@ -126,5 +83,29 @@ public final class NetworkClient {
         } receiveValue: {
             completion(.success(($0, $1)))
         }.store(in: &cancellables)
+    }
+
+    /// `makeAuthorizedRequest` method for making authorized network requests has three parameters and returns `Data`
+    ///  the network client must be initialised with an authorizationProvider else an error is thrown
+    ///
+    /// - Parameters:
+    ///   - scope: ``String`` for the scope of the authenticated token
+    ///   - request: ``URLRequest`` for the authorized network request
+    /// - Returns: ``Data`` the response data from the endpoint
+    public func makeAuthorizedRequest(
+        scope: String,
+        request: URLRequest
+    ) async throws -> Data {
+        guard let authorizationProvider else {
+            assertionFailure("Authorization provider not present")
+            throw NetworkClientError.authorizationProviderNotPresent
+        }
+
+        let authorizationToken = try await authorizationProvider
+            .fetchToken(withScope: scope)
+
+        let authorizedRequest = request.authorized(with: authorizationToken)
+        
+        return try await makeRequest(authorizedRequest)
     }
 }
