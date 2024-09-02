@@ -2,10 +2,10 @@ import Foundation
 @testable import Networking
 
 final class MockAuthorizationProvider: AuthorizationProvider {
-    private(set) var didFetchToken: String?
+    private(set) var fetchedTokenScope: String?
 
     func fetchToken(withScope scope: String) async throws -> String {
-        didFetchToken = scope
+        fetchedTokenScope = scope
         return "testBearerToken"
     }
 }

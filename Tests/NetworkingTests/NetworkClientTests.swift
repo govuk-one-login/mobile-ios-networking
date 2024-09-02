@@ -65,7 +65,7 @@ extension NetworkClientTests {
             .makeAuthorizedRequest(scope: "testScope", request: .example)
         XCTAssertEqual(returnedData, data)
         // THEN the correct scope is requested
-        XCTAssertEqual(authorizationProvider.didFetchToken, "testScope")
+        XCTAssertEqual(authorizationProvider.fetchedTokenScope, "testScope")
         // AND the access token is attached
         let request = try XCTUnwrap(MockURLProtocol.requests.first)
         let bearerToken = request.value(forHTTPHeaderField: "Authorization")
