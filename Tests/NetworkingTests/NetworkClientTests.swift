@@ -72,4 +72,3 @@ extension NetworkClientTests {
         XCTAssertEqual(bearerToken, "Bearer testBearerToken")
     }
 }
-
