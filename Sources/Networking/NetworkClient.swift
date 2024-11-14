@@ -11,8 +11,8 @@ public final class NetworkClient {
     private var cancellables: Set<AnyCancellable> = []
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
-    public convenience init() {
-        self.init(configuration: .ephemeral)
+    public convenience init(configuration: URLSessionConfiguration = .ephemeral) {
+        self.init(configuration: configuration)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
@@ -23,7 +23,7 @@ public final class NetworkClient {
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
     ///
-    public init(configuration: URLSessionConfiguration) {
+    init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
         configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
 #if DEBUG
