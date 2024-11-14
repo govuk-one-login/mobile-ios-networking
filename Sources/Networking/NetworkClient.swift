@@ -23,7 +23,7 @@ public final class NetworkClient {
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
     ///
-    init(configuration: URLSessionConfiguration) {
+    public init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
         configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
 #if DEBUG
