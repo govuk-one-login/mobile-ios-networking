@@ -1,7 +1,7 @@
 import Foundation
 @testable import TokenGeneration
 
-struct MockSigner: SigningService {
+struct MockJWTSigningService: JWTSigningService {
     func sign(data: Data) throws -> Data {
         data
     }

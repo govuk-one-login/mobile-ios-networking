@@ -2,18 +2,17 @@ import Foundation
 import Testing
 @testable import TokenGeneration
 
-struct SignedJWTGeneratorTests {
-    let mockSigner: MockSigner
+struct JWTGeneratorTests {
     let sut: JWTGenerator
     
     init() {
-        self.mockSigner = MockSigner()
-        self.sut = JWTGenerator(signer: mockSigner)
+        let mockJWTSigningService = MockJWTSigningService()
+        self.sut = JWTGenerator(signer: mockJWTSigningService)
     }
     
     @Test
     func generateJWTWithStrings() throws {
-        let jwt = try sut.generateJWT(
+        let jwt = try sut.generate(
             header: ["header_key_1": "header_value_1"],
             payload: ["payload_key_1": "payload_value_1"]
         )
@@ -25,7 +24,7 @@ struct SignedJWTGeneratorTests {
     
     @Test
     func generateJWTWithBaseTypes() throws {
-        let jwt = try sut.generateJWT(
+        let jwt = try sut.generate(
             header: [
                 "header_key_1": "header_value_1",
                 "header_key_2": 123456789,
@@ -48,7 +47,7 @@ struct SignedJWTGeneratorTests {
 
 }
 
-extension SignedJWTGeneratorTests {
+extension JWTGeneratorTests {
     func jwtToStringComponents(_ jwt: String) throws -> [String] {
         let components = jwt.components(separatedBy: ".")
         try #require(components.count == 3)

@@ -1,9 +1,13 @@
 import Foundation
 
 public struct JWTGenerator {
-    let signer: SigningService
+    private let signer: JWTSigningService
+    
+    public init(signer: JWTSigningService) {
+        self.signer = signer
+    }
 
-    func generateJWT(
+    func generate(
         header: [String: Any],
         payload: [String: Any]
     ) throws -> String {

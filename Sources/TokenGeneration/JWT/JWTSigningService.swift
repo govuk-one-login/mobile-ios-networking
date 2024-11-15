@@ -1,5 +1,5 @@
 import Foundation
 
-protocol SigningService {
+public protocol JWTSigningService {
     func sign(data: Data) throws -> Data
 }
