@@ -4,8 +4,8 @@ public struct SignedJWTGenerator: JWTGenerator {
     let signer: SigningService
 
     func generate(
-        header: [String : Any],
-        payload: [String : Any]
+        header: [String: Any],
+        payload: [String: Any]
     ) throws -> String {
         let headerData = try header.jsonData
         let payloadData = try payload.jsonData

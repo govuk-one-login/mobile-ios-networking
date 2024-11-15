@@ -1,6 +1,6 @@
 import Foundation
-@testable import TokenGeneration
 import Testing
+@testable import TokenGeneration
 
 struct SignedJWTGeneratorTests {
     let mockSigner: MockSigner
@@ -14,8 +14,8 @@ struct SignedJWTGeneratorTests {
     @Test
     func generate() throws {
         let jwt = try sut.generate(
-            header: ["header_key_1" : "header_value_1"],
-            payload: ["payload_key_1" : "payload_value_1"]
+            header: ["header_key_1": "header_value_1"],
+            payload: ["payload_key_1": "payload_value_1"]
         )
         let components = try jwtToStringComponents(jwt)
         #expect(components[0] == "{\"header_key_1\":\"header_value_1\"}")
