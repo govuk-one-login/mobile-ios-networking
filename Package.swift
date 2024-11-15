@@ -7,7 +7,8 @@ let package = Package(
     platforms: [.iOS(.v13)],
     products: [
         .library(name: "Networking", targets: ["Networking"]),
-        .library(name: "MockNetworking", targets: ["MockNetworking"])
+        .library(name: "MockNetworking", targets: ["MockNetworking"]),
+        .library(name: "TokenGeneration", targets: ["TokenGeneration"])
     ],
     targets: [
         .target(name: "Networking",
@@ -17,8 +18,10 @@ let package = Package(
                 ]
                ),
         .target(name: "MockNetworking", dependencies: ["Networking"]),
+        .target(name: "TokenGeneration"),
         .testTarget(name: "NetworkingTests",
                     dependencies: ["Networking", "MockNetworking"],
-                    resources: [.process("Pinning/Certificates")])
+                    resources: [.process("Pinning/Certificates")]),
+        .testTarget(name: "TokenGenerationTests")
     ]
 )
