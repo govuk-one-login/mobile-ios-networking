@@ -3,6 +3,6 @@ import Foundation
 
 struct MockSigner: SigningService {
     func sign(data: Data) throws -> Data {
-        <#code#>
+        data
     }
 }
