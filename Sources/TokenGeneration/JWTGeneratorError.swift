@@ -1,4 +1,4 @@
-public enum SignedJWTGeneratorError: Error {
+public enum JWTGeneratorError: Error {
     case cantCreateJSONData
     case cantCreateJSONString
 }

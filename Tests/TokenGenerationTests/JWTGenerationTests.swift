@@ -4,16 +4,16 @@ import Testing
 
 struct SignedJWTGeneratorTests {
     let mockSigner: MockSigner
-    let sut: SignedJWTGenerator
+    let sut: JWTGenerator
     
     init() {
         self.mockSigner = MockSigner()
-        self.sut = SignedJWTGenerator(signer: mockSigner)
+        self.sut = JWTGenerator(signer: mockSigner)
     }
     
     @Test
     func generate() throws {
-        let jwt = try sut.generate(
+        let jwt = try sut.generateJWT(
             header: ["header_key_1": "header_value_1"],
             payload: ["payload_key_1": "payload_value_1"]
         )
