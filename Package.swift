@@ -22,6 +22,6 @@ let package = Package(
         .testTarget(name: "NetworkingTests",
                     dependencies: ["Networking", "MockNetworking"],
                     resources: [.process("Pinning/Certificates")]),
-        .testTarget(name: "TokenGenerationTests")
+        .testTarget(name: "TokenGenerationTests", dependencies: ["TokenGeneration"])
     ]
 )

@@ -1,7 +1,12 @@
-//
-//  JWTGEnerationTests.swift
-//  Networking
-//
-//  Created by James, Dylan on 14/11/2024.
-//
+@testable import TokenGeneration
+import Testing
 
+struct SignedJWTGeneratorTests {
+    let mockSigner: MockSigner
+    let sut: SignedJWTGenerator
+    
+    init() {
+        self.mockSigner = MockSigner()
+        self.sut = SignedJWTGenerator(signer: mockSigner)
+    }
+}
