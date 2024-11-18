@@ -3,19 +3,20 @@ import Testing
 @testable import TokenGeneration
 
 struct JWTGeneratorTests {
-    let sut: JWTGenerator
-    
-    init() {
-        let mockJWTSigningService = MockJWTSigningService()
-        self.sut = JWTGenerator(signer: mockJWTSigningService)
-    }
+    let mockJWTSigningService = MockJWTSigningService()
     
     @Test
     func generateJWTWithStrings() throws {
-        let jwt = try sut.generate(
+        let mockJWTRepresentation = MockJWTRepresentation(
             header: ["header_key_1": "header_value_1"],
             payload: ["payload_key_1": "payload_value_1"]
         )
+        let sut = JWTGenerator(
+            jwtRepresentation: mockJWTRepresentation,
+            signer: mockJWTSigningService
+        )
+        
+        let jwt = try sut.token
         let components = try jwtToStringComponents(jwt)
         #expect(components[0] == "{\"header_key_1\":\"header_value_1\"}")
         #expect(components[1] == "{\"payload_key_1\":\"payload_value_1\"}")
@@ -24,7 +25,7 @@ struct JWTGeneratorTests {
     
     @Test
     func generateJWTWithBaseTypes() throws {
-        let jwt = try sut.generate(
+        let mockJWTRepresentation = MockJWTRepresentation(
             header: [
                 "header_key_1": "header_value_1",
                 "header_key_2": 123456789,
@@ -36,6 +37,12 @@ struct JWTGeneratorTests {
                 "payload_key_3": false
             ]
         )
+        let sut = JWTGenerator(
+            jwtRepresentation: mockJWTRepresentation,
+            signer: mockJWTSigningService
+        )
+        
+        let jwt = try sut.token
         let components = try jwtToStringComponents(jwt)
         #expect(components[0].contains("\"header_key_1\":\"header_value_1\""))
         #expect(components[0].contains("\"header_key_2\":123456789"))
