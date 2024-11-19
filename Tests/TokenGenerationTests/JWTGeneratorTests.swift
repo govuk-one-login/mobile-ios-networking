@@ -7,13 +7,13 @@ struct JWTGeneratorTests {
     
     @Test
     func generateJWTWithStrings() throws {
-        let mockJWTRepresentation = MockJWTRepresentation(
+        let mockJWTRepresentation = JWTRepresentation(
             header: ["header_key_1": "header_value_1"],
             payload: ["payload_key_1": "payload_value_1"]
         )
         let sut = JWTGenerator(
             jwtRepresentation: mockJWTRepresentation,
-            signer: mockJWTSigningService
+            signingService: mockJWTSigningService
         )
         
         let jwt = try sut.token
@@ -25,7 +25,7 @@ struct JWTGeneratorTests {
     
     @Test
     func generateJWTWithBaseTypes() throws {
-        let mockJWTRepresentation = MockJWTRepresentation(
+        let mockJWTRepresentation = JWTRepresentation(
             header: [
                 "header_key_1": "header_value_1",
                 "header_key_2": 123456789,
@@ -39,7 +39,7 @@ struct JWTGeneratorTests {
         )
         let sut = JWTGenerator(
             jwtRepresentation: mockJWTRepresentation,
-            signer: mockJWTSigningService
+            signingService: mockJWTSigningService
         )
         
         let jwt = try sut.token

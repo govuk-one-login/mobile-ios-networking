@@ -1,4 +1,4 @@
-public protocol JWTRepresentation {
-    var header: [String: Any] { get }
-    var payload: [String: Any] { get }
+public struct JWTRepresentation {
+    var header: [String: Any]
+    var payload: [String: Any]
 }
