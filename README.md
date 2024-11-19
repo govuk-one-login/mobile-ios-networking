@@ -203,4 +203,5 @@ The first (and currently only) token type which this module supports is a [JWT (
 
 ### JWTGenerator
 `JWTGenerator` is a type which takes a `JWTRepresentation` which includes dictionary properties for the header and payload of the JWT and a Signing Service which is used to create the JWT signature.
+
 The format of a JWT is a header, a payload and a signed representation of the header and payload. The header and payload elements of a JWT are JSON objects which are then base64 encoded. The signature is a signed representation of the header and payload, then base64 encoded. These are concatenated, and therefore separated by "."s to create a format suitable for reliable network transit.
