@@ -2,12 +2,12 @@ import Foundation
 
 public struct JWTGenerator {
     private let jwtRepresentation: JWTRepresentation
-    private let signer: JWTSigningService
+    private let signingService: JWTSigningService
     
     public init(jwtRepresentation: JWTRepresentation,
-                signer: JWTSigningService) {
+                signingService: JWTSigningService) {
         self.jwtRepresentation = jwtRepresentation
-        self.signer = signer
+        self.signingService = signingService
     }
 
     var token: String {
@@ -22,7 +22,7 @@ public struct JWTGenerator {
             
             let signableJSONString = headerJSONString + "." + payloadJSONString
             let dataToSign = Data(signableJSONString.utf8)
-            let signature = try signer.sign(data: dataToSign)
+            let signature = try signingService.sign(data: dataToSign)
             
             let encodedHeader = headerData.base64EncodedString()
             let encodedPayload = payloadData.base64EncodedString()

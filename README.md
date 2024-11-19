@@ -1,6 +1,6 @@
 # Networking
 
-Implementation of Networking client and Mock Networking client.
+Implementation of a Networking client and Mock Networking client module. Also a Token Generation module.
 
 ## Installation
 
@@ -30,16 +30,17 @@ Or for `MockNetworking`:
 )
 ```
 
-3. Add `import Networking` in your source code.
+3. Add `import Networking`, `import MockNetworking` or `import TokenGeneration` in your source code.
 
 ## Package description
 
-The main `Networking` Package is a unified implementation for networking to ensure that all HTTP requests made from the app are consistently well-formed. It also ensures that requests are pinned (to Amazon Root Certificates) and a user agent is attached.
+## Networking
+
+The `Networking` module is a unified implementation for networking to ensure that all HTTP requests made from the app are consistently well-formed. It also ensures that requests are pinned (to Amazon Root Certificates) and a user agent is attached.
 
 Certificate pinning is not recommended in general for mobile applications, given the sensitive nature of our applications, we have decided to add this as an additional layer of protection against man-in-the-middle attacks.
 
 The iOS validation would need to be set-up in your app codebase Info.plist for devices which are running iOS 14 or later. [The Apple Developer documentation](https://developer.apple.com/news/?id=g9ejcf8y) explains how this is set up. There is no additional setup for devices running iOS 13 or lower, as we have included that in this package.
-//add link to documentation
 
 > Within Sources/Networking exist the following protocols and Type for enabling the app to make network requests and pin certificates.
 
@@ -193,3 +194,14 @@ do {
 ```
 
 How you handle the returned data would depend on what data you expect to be returned.
+
+
+## TokenGeneration
+
+The `TokenGeneration` module is intended to facilitate the creation of tokens which are commonly used to secure network calls.
+The first (and currently only) token type which this module supports is a [JWT (JSON Web Token)](https://datatracker.ietf.org/doc/html/rfc7519).
+
+### JWTGenerator
+`JWTGenerator` is a type which takes a JWT Representation type which includes dictionaries for the header and payload of the JWT and a Signing Service which is used to create the JWT signature.
+The format of a JWT is a header, a payload and a signed representation of the header and payload. These are concatendated, and therefore separated by "."s.
+The header and payload elements of a JWT are JSON objects which are then base64 encoded, the signature is a signed representation of the header and payload, then base64 encoded. These are concatendated, and therefore separated by "."s to create a format suitable for reliable network transit.
