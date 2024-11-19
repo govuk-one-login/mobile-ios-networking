@@ -1,4 +1,4 @@
 public struct JWTRepresentation {
-    var header: [String: Any]
-    var payload: [String: Any]
+    let header: [String: Any]
+    let payload: [String: Any]
 }
