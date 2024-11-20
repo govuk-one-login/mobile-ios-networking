@@ -1,4 +1,4 @@
-import Foundation
+import Foundation.NSData
 import Testing
 @testable import TokenGeneration
 
@@ -7,60 +7,67 @@ struct JWTGeneratorTests {
     
     @Test
     func generateJWTWithStrings() throws {
+        let header = ["header_key_1": "header_value_1"]
+        let payload = ["payload_key_1": "payload_value_1"]
+        
         let mockJWTRepresentation = JWTRepresentation(
-            header: ["header_key_1": "header_value_1"],
-            payload: ["payload_key_1": "payload_value_1"]
+            header: header,
+            payload: payload
         )
         let sut = JWTGenerator(
             jwtRepresentation: mockJWTRepresentation,
             signingService: mockJWTSigningService
         )
-        
         let jwt = try sut.token
-        let components = try jwtToStringComponents(jwt)
-        #expect(components[0] == "{\"header_key_1\":\"header_value_1\"}")
-        #expect(components[1] == "{\"payload_key_1\":\"payload_value_1\"}")
-        #expect(components[2] == "{\"header_key_1\":\"header_value_1\"}.{\"payload_key_1\":\"payload_value_1\"}")
+        
+        let components = jwt.components(separatedBy: ".")
+        #expect(components.count == 3)
+        
+        let headerJSON = try header.jsonData
+        let payloadJSON = try payload.jsonData
+        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
+        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
+        let signature = Data((headerJSONString + "." + payloadJSONString).utf8)
+        
+        #expect(components[0] == headerJSON.base64URLEncodedString)
+        #expect(components[1] == payloadJSON.base64URLEncodedString)
+        #expect(components[2] == signature.base64URLEncodedString)
     }
     
-    // swiftlint:disable line_length
     @Test
     func generateJWTWithBaseTypes() throws {
+        let header: [String: Any] = [
+            "header_key_1": "header_value_1",
+            "header_key_2": 123456789,
+            "header_key_3": true
+        ]
+        let payload: [String: Any] = [
+            "payload_key_1": "payload_value_1",
+            "payload_key_2": 987654321,
+            "payload_key_3": false
+        ]
+        
         let mockJWTRepresentation = JWTRepresentation(
-            header: [
-                "header_key_1": "header_value_1",
-                "header_key_2": 123456789,
-                "header_key_3": true
-            ],
-            payload: [
-                "payload_key_1": "payload_value_1",
-                "payload_key_2": 987654321,
-                "payload_key_3": false
-            ]
+            header: header,
+            payload: payload
         )
         let sut = JWTGenerator(
             jwtRepresentation: mockJWTRepresentation,
             signingService: mockJWTSigningService
         )
-        
         let jwt = try sut.token
-        let components = try jwtToStringComponents(jwt)
-        #expect(components[0] == "{\"header_key_1\":\"header_value_1\",\"header_key_2\":123456789,\"header_key_3\":true}")
-        #expect(components[1] == "{\"payload_key_1\":\"payload_value_1\",\"payload_key_2\":987654321,\"payload_key_3\":false}")
-        #expect(components[2] == """
-        {\"header_key_1\":\"header_value_1\",\"header_key_2\":123456789,\"header_key_3\":true}.{\"payload_key_1\":\"payload_value_1\",\"payload_key_2\":987654321,\"payload_key_3\":false}
-        """)
-    }
-    // swiftlint:enable line_length
-}
-
-extension JWTGeneratorTests {
-    func jwtToStringComponents(_ jwt: String) throws -> [String] {
+        
         let components = jwt.components(separatedBy: ".")
-        try #require(components.count == 3)
-        return try components.map { component in
-            let decodedData = try #require(Data(base64Encoded: component))
-            return try #require(String(data: decodedData, encoding: .utf8))
-        }
+        #expect(components.count == 3)
+        
+        let headerJSON = try header.jsonData
+        let payloadJSON = try payload.jsonData
+        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
+        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
+        let signature = Data((headerJSONString + "." + payloadJSONString).utf8)
+
+        #expect(components[0] == headerJSON.base64URLEncodedString)
+        #expect(components[1] == payloadJSON.base64URLEncodedString)
+        #expect(components[2] == signature.base64URLEncodedString)
     }
 }

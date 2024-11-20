@@ -1,4 +1,4 @@
-import Foundation
+import Foundation.NSData
 
 public struct JWTGenerator {
     private let jwtRepresentation: JWTRepresentation
@@ -24,9 +24,9 @@ public struct JWTGenerator {
             let dataToSign = Data(signableJSONString.utf8)
             let signature = try signingService.sign(data: dataToSign)
             
-            let encodedHeader = headerData.base64EncodedString()
-            let encodedPayload = payloadData.base64EncodedString()
-            let encodedSignature = signature.base64EncodedString()
+            let encodedHeader = headerData.base64URLEncodedString
+            let encodedPayload = payloadData.base64URLEncodedString
+            let encodedSignature = signature.base64URLEncodedString
             
             return "\(encodedHeader).\(encodedPayload).\(encodedSignature)"
         }
