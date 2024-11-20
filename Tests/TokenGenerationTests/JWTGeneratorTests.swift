@@ -23,6 +23,7 @@ struct JWTGeneratorTests {
         #expect(components[2] == "{\"header_key_1\":\"header_value_1\"}.{\"payload_key_1\":\"payload_value_1\"}")
     }
     
+    // swiftlint:disable line_length
     @Test
     func generateJWTWithBaseTypes() throws {
         let mockJWTRepresentation = JWTRepresentation(
@@ -50,6 +51,7 @@ struct JWTGeneratorTests {
         {\"header_key_1\":\"header_value_1\",\"header_key_2\":123456789,\"header_key_3\":true}.{\"payload_key_1\":\"payload_value_1\",\"payload_key_2\":987654321,\"payload_key_3\":false}
         """)
     }
+    // swiftlint:enable line_length
 }
 
 extension JWTGeneratorTests {
