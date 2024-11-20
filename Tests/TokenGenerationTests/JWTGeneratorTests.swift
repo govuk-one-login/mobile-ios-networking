@@ -44,14 +44,12 @@ struct JWTGeneratorTests {
         
         let jwt = try sut.token
         let components = try jwtToStringComponents(jwt)
-        #expect(components[0].contains("\"header_key_1\":\"header_value_1\""))
-        #expect(components[0].contains("\"header_key_2\":123456789"))
-        #expect(components[0].contains("\"header_key_3\":true"))
-        #expect(components[1].contains("\"payload_key_1\":\"payload_value_1\""))
-        #expect(components[1].contains("\"payload_key_2\":987654321"))
-        #expect(components[1].contains("\"payload_key_3\":false"))
+        #expect(components[0] == "{\"header_key_1\":\"header_value_1\",\"header_key_2\":123456789,\"header_key_3\":true}")
+        #expect(components[1] == "{\"payload_key_1\":\"payload_value_1\",\"payload_key_2\":987654321,\"payload_key_3\":false}")
+        #expect(components[2] == """
+        {\"header_key_1\":\"header_value_1\",\"header_key_2\":123456789,\"header_key_3\":true}.{\"payload_key_1\":\"payload_value_1\",\"payload_key_2\":987654321,\"payload_key_3\":false}
+        """)
     }
-
 }
 
 extension JWTGeneratorTests {
