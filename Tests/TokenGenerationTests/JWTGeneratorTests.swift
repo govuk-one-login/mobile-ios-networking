@@ -10,12 +10,12 @@ struct JWTGeneratorTests {
         let header = ["header_key_1": "header_value_1"]
         let payload = ["payload_key_1": "payload_value_1"]
         
-        let mockJWTRepresentation = JWTRepresentation(
+        let jwtRepresentation = JWTRepresentation(
             header: header,
             payload: payload
         )
         let sut = JWTGenerator(
-            jwtRepresentation: mockJWTRepresentation,
+            jwtRepresentation: jwtRepresentation,
             signingService: mockJWTSigningService
         )
         let jwt = try sut.token
@@ -47,12 +47,12 @@ struct JWTGeneratorTests {
             "payload_key_3": false
         ]
         
-        let mockJWTRepresentation = JWTRepresentation(
+        let jwtRepresentation = JWTRepresentation(
             header: header,
             payload: payload
         )
         let sut = JWTGenerator(
-            jwtRepresentation: mockJWTRepresentation,
+            jwtRepresentation: jwtRepresentation,
             signingService: mockJWTSigningService
         )
         let jwt = try sut.token
