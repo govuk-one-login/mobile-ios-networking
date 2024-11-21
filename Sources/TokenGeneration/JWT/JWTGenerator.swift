@@ -12,8 +12,10 @@ public struct JWTGenerator {
     
     var token: String {
         get throws {
-            let headerData = try jwtRepresentation.header.jsonData
-            let payloadData = try jwtRepresentation.payload.jsonData
+            guard let headerData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.header),
+                  let payloadData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.payload) else {
+                throw JWTGeneratorError.cantCreateJSONData
+            }
             
             guard let headerJSONString = String(data: headerData, encoding: .utf8),
                   let payloadJSONString = String(data: payloadData, encoding: .utf8) else {

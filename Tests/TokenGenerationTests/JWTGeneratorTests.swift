@@ -20,14 +20,12 @@ struct JWTGeneratorTests {
         )
         let jwt = try sut.token
         
+        let headerJSON = try JSONSerialization.data(withJSONObject: header)
+        let payloadJSON = try JSONSerialization.data(withJSONObject: payload)
+        let signature = try createSignatureFromJSON(headerJSON: headerJSON, payloadJSON: payloadJSON)
+        
         let components = jwt.components(separatedBy: ".")
         #expect(components.count == 3)
-        
-        let headerJSON = try header.jsonData
-        let payloadJSON = try payload.jsonData
-        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
-        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
-        let signature = Data((headerJSONString + "." + payloadJSONString).utf8)
         
         #expect(components[0] == headerJSON.base64URLEncodedString)
         #expect(components[1] == payloadJSON.base64URLEncodedString)
@@ -57,17 +55,21 @@ struct JWTGeneratorTests {
         )
         let jwt = try sut.token
         
+        let headerJSON = try JSONSerialization.data(withJSONObject: header)
+        let payloadJSON = try JSONSerialization.data(withJSONObject: payload)
+        let signature = try createSignatureFromJSON(headerJSON: headerJSON, payloadJSON: payloadJSON)
+        
         let components = jwt.components(separatedBy: ".")
         #expect(components.count == 3)
-        
-        let headerJSON = try header.jsonData
-        let payloadJSON = try payload.jsonData
-        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
-        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
-        let signature = Data((headerJSONString + "." + payloadJSONString).utf8)
 
         #expect(components[0] == headerJSON.base64URLEncodedString)
         #expect(components[1] == payloadJSON.base64URLEncodedString)
         #expect(components[2] == signature.base64URLEncodedString)
+    }
+    
+    private func createSignatureFromJSON(headerJSON: Data, payloadJSON: Data) throws -> Data {
+        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
+        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
+        return Data((headerJSONString + "." + payloadJSONString).utf8)
     }
 }
