@@ -2,6 +2,7 @@ import Foundation.NSData
 
 extension Data {
     /// Base 64 encoding the string.
+    /// Description of this format: https://datatracker.ietf.org/doc/html/rfc4648#section-5
     ///
     /// Removing unallowed URL encoded character:
     ///   - "="
