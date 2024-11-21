@@ -10,7 +10,7 @@ public struct JWTGenerator {
         self.signingService = signingService
     }
     
-    var token: String {
+    public var token: String {
         get throws {
             guard let headerData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.header),
                   let payloadData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.payload) else {
