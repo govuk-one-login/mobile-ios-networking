@@ -12,25 +12,21 @@ public struct JWTGenerator {
     
     public var token: String {
         get throws {
-            guard let headerData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.header),
-                  let payloadData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.payload) else {
+            guard let headerJSONData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.header),
+                  let payloadJSONData = try? JSONSerialization.data(withJSONObject: jwtRepresentation.payload) else {
                 throw JWTGeneratorError.cantCreateJSONData
             }
             
-            guard let headerJSONString = String(data: headerData, encoding: .utf8),
-                  let payloadJSONString = String(data: payloadData, encoding: .utf8) else {
-                throw JWTGeneratorError.cantCreateJSONString
-            }
+            let encodedHeaderJSONData = headerJSONData.base64URLEncodedString
+            let encodedPayloadJSONData = payloadJSONData.base64URLEncodedString
             
-            let signableJSONString = headerJSONString + "." + payloadJSONString
-            let dataToSign = Data(signableJSONString.utf8)
+            let signableJSONData = encodedHeaderJSONData + "." + encodedPayloadJSONData
+            let dataToSign = Data(signableJSONData.utf8)
             let signature = try signingService.sign(data: dataToSign)
-            
-            let encodedHeader = headerData.base64URLEncodedString
-            let encodedPayload = payloadData.base64URLEncodedString
+
             let encodedSignature = signature.base64URLEncodedString
             
-            return "\(encodedHeader).\(encodedPayload).\(encodedSignature)"
+            return "\(encodedHeaderJSONData).\(encodedPayloadJSONData).\(encodedSignature)"
         }
     }
 }

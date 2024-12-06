@@ -68,8 +68,8 @@ struct JWTGeneratorTests {
     }
     
     private func createSignatureFromJSON(headerJSON: Data, payloadJSON: Data) throws -> Data {
-        let headerJSONString = try #require(String(data: headerJSON, encoding: .utf8))
-        let payloadJSONString = try #require(String(data: payloadJSON, encoding: .utf8))
-        return Data((headerJSONString + "." + payloadJSONString).utf8)
+        let encodedHeaderJSON = headerJSON.base64URLEncodedString
+        let encodedPayloadJSON = payloadJSON.base64URLEncodedString
+        return Data((encodedHeaderJSON + "." + encodedPayloadJSON).utf8)
     }
 }
