@@ -3,7 +3,7 @@ import Foundation
 /// SecurityEvaluator
 ///
 /// Protocol with two methods. One for `evaluatingServerTrust` and a second for `getTrustCertificate`
-protocol SecurityEvaluator {
+protocol SecurityEvaluator: Sendable {
     func evaluateServerTrust(for serverTrust: SecTrust, error: UnsafeMutablePointer<CFError?>?) -> Bool
     func getTrustCertificate(for serverTrust: SecTrust, at index: Int) -> SecCertificate?
 }

@@ -13,13 +13,14 @@ final class SSLPinningDelegate: NSObject, URLSessionDelegate {
         case certificateNotPinnedInBundle
     }
     
-    var evaluator: SecurityEvaluator
-    var catchBlock: ((Error?) -> Void)? /* This catchBlock is only used to unit test error handling */
-    
-    init(with evaluator: SecurityEvaluator = X509CertificateSecurityEvaluator(),
-         catchBlock: ((Error?) -> Void)? = nil) {
+    let evaluator: SecurityEvaluator
+//    let catchBlock: ((Error) -> Void)? /* This catchBlock is only used to unit test error handling */
+
+    init(with evaluator: SecurityEvaluator = X509CertificateSecurityEvaluator()
+//         catchBlock: ((Error?) -> Void)? = nil
+    ) {
         self.evaluator = evaluator
-        self.catchBlock = catchBlock
+//        self.catchBlock = catchBlock
     }
     
     /// urlSession
@@ -35,7 +36,7 @@ final class SSLPinningDelegate: NSObject, URLSessionDelegate {
             completionHandler(.useCredential, credential)
         } catch {
             completionHandler(.cancelAuthenticationChallenge, nil)
-            catchBlock?(error)
+//            catchBlock?(error)
         }
     }
 

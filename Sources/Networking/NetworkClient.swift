@@ -1,4 +1,5 @@
 import Combine
+import UIKit
 import Foundation
 
 /// NetworkClient
@@ -11,8 +12,8 @@ public final class NetworkClient {
     private var cancellables: Set<AnyCancellable> = []
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
-    public convenience init() {
-        self.init(configuration: .ephemeral)
+    public convenience init() async {
+        await self.init(configuration: .ephemeral)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
@@ -23,9 +24,9 @@ public final class NetworkClient {
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
     ///
-    init(configuration: URLSessionConfiguration) {
+    init(configuration: URLSessionConfiguration) async {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
-        configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
+        configuration.httpAdditionalHeaders = await ["User-Agent": UserAgent(device: UIDevice.current ).description]
 #if DEBUG
         print(configuration.httpAdditionalHeaders!)
 #endif

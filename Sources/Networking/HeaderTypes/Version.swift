@@ -3,7 +3,7 @@ import Foundation
 /// Version
 ///
 /// A type for storing the app version in a structured object. Used to assemble the `UserAgent` HTTP header and for checking the app version.
-public struct Version: CustomStringConvertible {
+public struct Version: CustomStringConvertible, Sendable {
     let major: Int
     let minor: Int
     let increment: Int
@@ -28,8 +28,8 @@ public struct Version: CustomStringConvertible {
         self.increment = increment
     }
     
-    public static var one = Version(1, 0, 0)
-    
+    public static let one = Version(1, 0, 0)
+
     public var description: String {
         "\(major).\(minor).\(increment)"
     }

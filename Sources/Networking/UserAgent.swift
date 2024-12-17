@@ -22,7 +22,7 @@ struct UserAgent: CustomStringConvertible {
     ///  - `darwin` of type `String` and defaults to that returned from `DarwinVersion`
     init(app: AppBundle = Bundle.main,
          deviceModel: String = DeviceModel().description,
-         device: Device = UIDevice.current,
+         device: Device,
          cfapp: AppBundle? = Bundle(identifier: "com.apple.CFNetwork"),
          darwin: String = DarwinVersion().description) {
         self.app = app

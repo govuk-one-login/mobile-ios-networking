@@ -4,10 +4,10 @@ import Foundation
 ///
 /// Used for mocking a url response for unit testing.
 public final class MockURLProtocol: URLProtocol {
-    public private(set) static var requests: [URLRequest] = []
-    public static var handler: (() throws -> (Data, URLResponse))?
-    
-    public static func clear() {
+    nonisolated(unsafe) public private(set) static var requests: [URLRequest] = []
+    nonisolated(unsafe) public static var handler: (() throws -> (Data, URLResponse))?
+
+    nonisolated(unsafe) public static func clear() {
         requests = []
         handler = nil
     }
@@ -15,7 +15,7 @@ public final class MockURLProtocol: URLProtocol {
     public override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         request
     }
-    
+
     public override static func canInit(with request: URLRequest) -> Bool {
         requests.append(request)
         return true
