@@ -78,6 +78,10 @@ struct UserAgent: CustomStringConvertible {
     
     // MARK: Creating the UserAgent header string
     var description: String {
-        "\(appInfo) \(deviceModel) \(osVersion) \(cfNetwork) \(darwin)"
+        return [appInfo, deviceModel, osVersion, cfNetwork, darwin]
+            .map {
+                $0.replacingOccurrences(of: " ", with: "_")
+            }
+            .joined(separator: " ")
     }
 }
