@@ -12,16 +12,17 @@ let package = Package(
     ],
     targets: [
         .target(name: "Networking",
-                resources: [.process("Pinning/Certificates")],
                 swiftSettings: [
                     .define("DEBUG", .when(configuration: .debug))
-                ]
-               ),
+                ]),
         .target(name: "MockNetworking", dependencies: ["Networking"]),
         .target(name: "TokenGeneration"),
         .testTarget(name: "NetworkingTests",
-                    dependencies: ["Networking", "MockNetworking"],
-                    resources: [.process("Pinning/Certificates")]),
-        .testTarget(name: "TokenGenerationTests", dependencies: ["TokenGeneration"])
+                    dependencies: [
+                        "Networking",
+                        "MockNetworking"
+                    ]),
+        .testTarget(name: "TokenGenerationTests",
+                    dependencies: ["TokenGeneration"])
     ]
 )
