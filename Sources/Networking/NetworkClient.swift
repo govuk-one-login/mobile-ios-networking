@@ -26,23 +26,10 @@ public final class NetworkClient {
     init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
         configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
-#if DEBUG
+        #if DEBUG
         print(configuration.httpAdditionalHeaders!)
-#endif
-        if #available(iOS 14, *) {
-            // On iOS 14+, certificate pinning is handled by NSAppTransportSecurity
-            // https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity
-            session = .init(configuration: configuration)
-        } else {
-            let queue = OperationQueue()
-            queue.underlyingQueue = .global()
-
-            let delegate = SSLPinningDelegate()
-
-            session = .init(configuration: configuration,
-                            delegate: delegate,
-                            delegateQueue: queue)
-        }
+        #endif
+        session = .init(configuration: configuration)
     }
     
     /// `makeRequest` method for making network requests has a single parameter of type `URLRequest` and returns `Data`
