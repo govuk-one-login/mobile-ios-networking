@@ -10,7 +10,9 @@ public struct Version: CustomStringConvertible {
     
     /// Failable initialiser for `Version` which accepts a single String argument. Because it is failable, it returns an optional `Version`.
     public init?(string: String) {
-        let values = string.split(separator: ".").compactMap {
+        let values = string
+            .split(separator: ".")
+            .compactMap {
             Int($0)
         }
         guard values.count == 3 else {
