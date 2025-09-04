@@ -3,9 +3,7 @@ import Foundation
 import Testing
 
 struct VersionTests {
-    @Test("""
-        Initialise Version from a string
-    """)
+    @Test("Initialise Version from a string")
     func string() {
         let sut = Version(string: "1.2.3")
         #expect(sut?.major == 1)
@@ -13,9 +11,7 @@ struct VersionTests {
         #expect(sut?.increment == 3)
     }
     
-    @Test("""
-        Initialise Version by decoding from JSON
-    """)
+    @Test("Initialise Version by decoding from JSON")
     func json() throws {
         let sut = try JSONDecoder()
             .decode(Version.self, from: Data(#""1.2.3""#.utf8))
@@ -24,9 +20,7 @@ struct VersionTests {
         #expect(sut.increment == 3)
     }
     
-    @Test("""
-        Error initialising Version by decoding from invalid JSON
-    """)
+    @Test("Error initialising Version by decoding from invalid JSON")
     func jsonError() throws {
         #expect(throws: DecodingError.self) {
             try JSONDecoder()
@@ -34,9 +28,7 @@ struct VersionTests {
         }
     }
     
-    @Test("""
-        Check comparable conformance works
-    """)
+    @Test("Check comparable conformance works")
     func compare() throws {
         var lower: Version
         var higher: Version
