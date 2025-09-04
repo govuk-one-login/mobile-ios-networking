@@ -1,5 +1,5 @@
-@testable import Networking
 import Foundation
+@testable import Networking
 import Testing
 
 struct VersionTests {
