@@ -9,3 +9,5 @@ public struct ServerError: ErrorWithCode {
     public let endpoint: String?
     public let errorCode: Int
 }
+
+extension ServerError: CustomNSError {}
