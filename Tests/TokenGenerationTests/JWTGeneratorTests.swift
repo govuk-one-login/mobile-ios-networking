@@ -66,7 +66,38 @@ struct JWTGeneratorTests {
         #expect(components[1] == payloadJSON.base64URLEncodedString)
         #expect(components[2] == signature.base64URLEncodedString)
     }
-    
+
+    @Test
+    func generateJWTWithCustomImplementation() throws {
+        struct Content: JWTContent {
+            var header: [String: Any] {
+                ["header_key_1": "header_value_1"]
+            }
+
+            var payload: [String: Any] {
+                ["payload_key_1": "payload_value_1"]
+            }
+        }
+
+        let content = Content()
+        let sut = JWTGenerator(
+            jwtRepresentation: content,
+            signingService: mockJWTSigningService
+        )
+        let jwt = try sut.token
+
+        let headerJSON = try JSONSerialization.data(withJSONObject: content.header)
+        let payloadJSON = try JSONSerialization.data(withJSONObject: content.payload)
+        let signature = try createSignatureFromJSON(headerJSON: headerJSON, payloadJSON: payloadJSON)
+
+        let components = jwt.components(separatedBy: ".")
+        #expect(components.count == 3)
+
+        #expect(components[0] == headerJSON.base64URLEncodedString)
+        #expect(components[1] == payloadJSON.base64URLEncodedString)
+        #expect(components[2] == signature.base64URLEncodedString)
+    }
+
     private func createSignatureFromJSON(headerJSON: Data, payloadJSON: Data) throws -> Data {
         let encodedHeaderJSON = headerJSON.base64URLEncodedString
         let encodedPayloadJSON = payloadJSON.base64URLEncodedString
