@@ -1,10 +1,10 @@
 import Foundation.NSData
 
 public struct JWTGenerator {
-    private let jwtRepresentation: JWTRepresentation
+    private let jwtRepresentation: JWTContent
     private let signingService: JWTSigningService
     
-    public init(jwtRepresentation: JWTRepresentation,
+    public init(jwtRepresentation: JWTContent,
                 signingService: JWTSigningService) {
         self.jwtRepresentation = jwtRepresentation
         self.signingService = signingService
