@@ -48,7 +48,18 @@ public final class NetworkClient {
                     print("last path component", response.url?.pathComponents.last ?? "")
                     #endif
                     guard response.isSuccessful else {
-                        continuation.resume(throwing: ServerError(endpoint: request.url?.pathComponents.last, errorCode: response.statusCode))
+                        var grantType: ErrorResponse? = nil
+                        
+                        do {
+                            grantType = try JSONDecoder().decode(ErrorResponse.self, from: data)
+                        } catch {
+                            print("Couldn't decode error type")
+                        }
+                        
+                        var serverError = ServerError(endpoint: request.url?.pathComponents.last, errorCode: response.statusCode)
+                        serverError.grantType = grantType?.error
+                        
+                        continuation.resume(throwing: serverError)
                         return
                     }
                     continuation.resume(returning: data)
