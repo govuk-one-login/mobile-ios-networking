@@ -48,7 +48,9 @@ public final class NetworkClient {
                     print("last path component", response.url?.pathComponents.last ?? "")
                     #endif
                     guard response.isSuccessful else {
-                        continuation.resume(throwing: ServerError(endpoint: request.url?.pathComponents.last, errorCode: response.statusCode))
+                        continuation.resume(throwing: ServerError(endpoint: request.url?.pathComponents.last,
+                                                                  errorCode: response.statusCode,
+                                                                  response: data))
                         return
                     }
                     continuation.resume(returning: data)
