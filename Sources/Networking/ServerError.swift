@@ -10,8 +10,8 @@ public struct ServerError: ErrorWithCode {
     public let errorCode: Int
     public let response: Data?
     
-    public init(reson: String? = "server", endpoint: String?, errorCode: Int, response: Data? = nil) {
-        self.reason = reson
+    public init(reason: String? = "server", endpoint: String?, errorCode: Int, response: Data? = nil) {
+        self.reason = reason
         self.endpoint = endpoint
         self.errorCode = errorCode
         self.response = response
