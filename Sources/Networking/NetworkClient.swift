@@ -10,7 +10,7 @@ public final class NetworkClient {
     private let session: URLSession
     private var cancellables: Set<AnyCancellable> = []
     
-    /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
+    /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
     public convenience init() {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy

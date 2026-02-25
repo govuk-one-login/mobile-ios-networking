@@ -40,6 +40,11 @@ extension NetworkClientTests {
         XCTAssertEqual(configuration.requestCachePolicy, .useProtocolCachePolicy)
     }
     
+    func test_convenienceInit_executes() async throws {
+        let sut = NetworkClient()
+        XCTAssertNotNil(sut)
+    }
+    
     func test_makeRequest_returnsData() async throws {
         let originalDate = Date()
         let firstData = Data("{ testResult \(originalDate)}".utf8)
