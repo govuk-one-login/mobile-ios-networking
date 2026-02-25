@@ -12,7 +12,9 @@ public final class NetworkClient {
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
     public convenience init() {
-        self.init(configuration: .ephemeral)
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .useProtocolCachePolicy
+        self.init(configuration: config)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.

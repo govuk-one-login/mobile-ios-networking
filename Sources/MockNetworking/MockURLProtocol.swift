@@ -24,7 +24,7 @@ public final class MockURLProtocol: URLProtocol {
     public override func startLoading() {
         do {
             if let (data, response) = try Self.handler?() {
-                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .allowed)
                 client?.urlProtocol(self, didLoad: data)
             }
         } catch {
