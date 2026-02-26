@@ -40,9 +40,13 @@ extension NetworkClientTests {
         XCTAssertEqual(configuration.requestCachePolicy, .useProtocolCachePolicy)
     }
     
-    func test_convenienceInit_executes() async throws {
+    func test_convenienceInit_assertConfiguration() async throws {
         let sut = NetworkClient()
-        XCTAssertNotNil(sut)
+        let config = sut.debugSession.configuration
+        
+        XCTAssertEqual(config.requestCachePolicy, .useProtocolCachePolicy)
+        XCTAssertNotNil(config.urlCache)
+        XCTAssertNotNil(config.httpCookieStorage)
     }
     
     func test_makeRequest_returnsData() async throws {

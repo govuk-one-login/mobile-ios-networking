@@ -10,6 +10,12 @@ public final class NetworkClient {
     private let session: URLSession
     private var cancellables: Set<AnyCancellable> = []
     
+    #if DEBUG
+        var debugSession: URLSession {
+            session
+        }
+    #endif
+    
     /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
     public convenience init() {
         let config = URLSessionConfiguration.default
