@@ -11,7 +11,7 @@ final class NetworkClientTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        configuration = URLSessionConfiguration.ephemeral
+        configuration = URLSessionConfiguration.default
         configuration.protocolClasses = [MockURLProtocol.self]
 
         authorizationProvider = MockAuthorizationProvider()
@@ -31,15 +31,45 @@ extension NetworkClientTests {
         XCTAssertEqual(configuration.tlsMinimumSupportedProtocolVersion, .TLSv12)
     }
     
+    func test_initialisation_UsesProtocolCachePolicy() throws {
+        let configuration = URLSessionConfiguration.default
+        configuration.protocolClasses = [MockURLProtocol.self]
+        
+        _ = NetworkClient(configuration: configuration)
+        
+        XCTAssertEqual(configuration.requestCachePolicy, .useProtocolCachePolicy)
+    }
+    
+    func test_convenienceInit_assertConfiguration() async throws {
+        let sut = NetworkClient()
+        let config = sut.debugSession.configuration
+        
+        XCTAssertEqual(config.requestCachePolicy, .useProtocolCachePolicy)
+        XCTAssertNotNil(config.urlCache)
+        XCTAssertNotNil(config.httpCookieStorage)
+    }
+    
     func test_makeRequest_returnsData() async throws {
-        let data = Data("{ testResult }".utf8)
+        let originalDate = Date()
+        let firstData = Data("{ testResult \(originalDate)}".utf8)
         
         MockURLProtocol.handler = {
-            (data, HTTPURLResponse(statusCode: 200))
+            (firstData, HTTPURLResponse(statusCode: 200))
         }
-
-        let returnedData = try await sut.makeRequest(.example)
-        XCTAssertEqual(returnedData, data)
+        
+        let firstResponse = try await sut.makeRequest(.example)
+        XCTAssertEqual(firstResponse, firstData)
+        
+        
+        let secondData = Data("{ testResult \(Date())}".utf8)
+        
+        MockURLProtocol.handler = {
+            
+            (secondData, HTTPURLResponse(statusCode: 200))
+        }
+        
+        let secondResponse = try await sut.makeRequest(.example)
+        XCTAssertEqual(secondResponse, secondData)
     }
     
     func test_makeRequest_returnsServerError() async throws {

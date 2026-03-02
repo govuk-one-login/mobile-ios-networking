@@ -10,9 +10,17 @@ public final class NetworkClient {
     private let session: URLSession
     private var cancellables: Set<AnyCancellable> = []
     
-    /// Convenience initialiser that uses the `URLSessionConfiguration.ephemeral` singleton
+    #if DEBUG
+        var debugSession: URLSession {
+            session
+        }
+    #endif
+    
+    /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
     public convenience init() {
-        self.init(configuration: .ephemeral)
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .useProtocolCachePolicy
+        self.init(configuration: config)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
