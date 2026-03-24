@@ -1,4 +1,3 @@
-import Combine
 import Foundation
 
 /// NetworkClient
@@ -8,7 +7,6 @@ public final class NetworkClient {
     public var authorizationProvider: AuthorizationProvider?
 
     private let session: URLSession
-    private var cancellables: Set<AnyCancellable> = []
     
     #if DEBUG
         var debugSession: URLSession {
@@ -46,40 +44,22 @@ public final class NetworkClient {
     ///   - request: ``URLRequest`` for the network request
     /// - Returns: ``Data`` the response data from the endpoint
     public func makeRequest(_ request: URLRequest) async throws -> Data {
-        try await withCheckedThrowingContinuation { continuation in
-            makeRequest(request) { response in
-                switch response {
-                case .success((let data, let response as HTTPURLResponse)):
-                    #if DEBUG
-                    print("network status code: \(response.statusCode)")
-                    print("absolute path", response.url?.absoluteString ?? "")
-                    print("last path component", response.url?.pathComponents.last ?? "")
-                    #endif
-                    guard response.isSuccessful else {
-                        continuation.resume(throwing: ServerError(endpoint: request.url?.pathComponents.last,
-                                                                  errorCode: response.statusCode,
-                                                                  response: data))
-                        return
-                    }
-                    continuation.resume(returning: data)
-                case .success((let data, _)):
-                    continuation.resume(returning: data)
-                case .failure(let error):
-                    continuation.resume(throwing: error)
-                }
+        let (data, response) = try await session.data(for: request)
+        
+        if let httpResponse = response as? HTTPURLResponse {
+            #if DEBUG
+            print("network status code: \(httpResponse.statusCode)")
+            print("absolute path", httpResponse.url?.absoluteString ?? "")
+            print("last path component", httpResponse.url?.pathComponents.last ?? "")
+            #endif
+            guard httpResponse.isSuccessful else {
+                throw ServerError(endpoint: request.url?.pathComponents.last,
+                                  errorCode: httpResponse.statusCode,
+                                  response: data)
             }
         }
-    }
-    
-    private func makeRequest(_ request: URLRequest,
-                             completion: @escaping (Result<(Data, URLResponse), Error>) -> Void) {
-        session.dataTaskPublisher(for: request).sink {
-            if case .failure(let error) = $0 {
-                completion(.failure(error))
-            }
-        } receiveValue: {
-            completion(.success(($0, $1)))
-        }.store(in: &cancellables)
+        
+        return data
     }
 
     /// `makeAuthorizedRequest` method for making authorized network requests has three parameters and returns `Data`
