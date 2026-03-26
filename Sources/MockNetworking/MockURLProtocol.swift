@@ -4,6 +4,10 @@ import Foundation
 ///
 /// Used for mocking a url response for unit testing.
 public final class MockURLProtocol: URLProtocol {
+    enum MockURLProtocolError: String, Error {
+        case noHandlerSet = "Remember to set a handler closure when using MockURLProtocol"
+    }
+    
     public private(set) static var requests: [URLRequest] = []
     public static var handler: (() throws -> (Data, URLResponse))?
     
@@ -23,16 +27,20 @@ public final class MockURLProtocol: URLProtocol {
     
     public override func startLoading() {
         do {
-            if let (data, response) = try Self.handler?() {
-                client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .allowed)
-                client?.urlProtocol(self, didLoad: data)
+            guard let handler = Self.handler else {
+                assertionFailure(MockURLProtocolError.noHandlerSet.rawValue)
+                throw MockURLProtocolError.noHandlerSet
             }
+            let (data, response) = try handler()
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .allowed)
+            client?.urlProtocol(self, didLoad: data)
         } catch {
             client?.urlProtocol(self, didFailWithError: error)
         }
         
         client?.urlProtocolDidFinishLoading(self)
     }
+
     
     public override func stopLoading() {
         // This method is unused in the mock currently
