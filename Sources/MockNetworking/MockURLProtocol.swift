@@ -4,12 +4,21 @@ import Foundation
 ///
 /// Used for mocking a url response for unit testing.
 public final class MockURLProtocol: URLProtocol {
+    enum MockURLProtocolError: String, Error {
+        case noHandlerSet = "⚠️ Remember to set a handler closure when using MockURLProtocol"
+    }
+    
     public private(set) static var requests: [URLRequest] = []
-    public static var handler: (() throws -> (Data, URLResponse))?
+    public static var handler: (() throws -> (data: Data, response: URLResponse)) = defaultHandler
+    
+    static let defaultHandler: (() throws -> (Data, URLResponse)) = {
+        assertionFailure(MockURLProtocolError.noHandlerSet.rawValue)
+        throw MockURLProtocolError.noHandlerSet
+    }
     
     public static func clear() {
         requests = []
-        handler = nil
+        handler = defaultHandler
     }
     
     public override static func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -22,22 +31,17 @@ public final class MockURLProtocol: URLProtocol {
     }
     
     public override func startLoading() {
-        guard let handler = Self.handler else {
-            assertionFailure("Remember to set a handler closure when using MockURLProtocol")
-            return
-        }
-        
         do {
-            let (data, response) = try handler()
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .allowed)
-            client?.urlProtocol(self, didLoad: data)
+            let handlerResult = try Self.handler()
+            
+            client?.urlProtocol(self, didReceive: handlerResult.response, cacheStoragePolicy: .allowed)
+            client?.urlProtocol(self, didLoad: handlerResult.data)
             client?.urlProtocolDidFinishLoading(self)
             
         } catch {
             client?.urlProtocol(self, didFailWithError: error)
         }
     }
-
     
     public override func stopLoading() {
         // This method is unused in the mock currently
