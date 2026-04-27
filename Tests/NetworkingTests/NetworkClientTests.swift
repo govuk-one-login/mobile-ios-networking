@@ -100,5 +100,7 @@ extension NetworkClientTests {
         let request = try XCTUnwrap(MockURLProtocol.requests.first)
         let bearerToken = request.value(forHTTPHeaderField: "Authorization")
         XCTAssertEqual(bearerToken, "Bearer testBearerToken")
+        let userAgent = request.allHTTPHeaderFields?["User-Agent"]
+        XCTAssertEqual(userAgent, UserAgent().description)
     }
 }
