@@ -2,7 +2,6 @@ import Foundation
 @testable import Networking
 import XCTest
 
-
 final class RequestBuilderTests: XCTestCase {
     // NetworkClient Mock
     private final class MockNetworkClient: NetworkClientProtocol {
@@ -30,7 +29,7 @@ final class RequestBuilderTests: XCTestCase {
     }
 }
 
-extension RequestBuilderTests {    
+extension RequestBuilderTests {
     func test_authentication_request() {
         // No auth scope set by default
         XCTAssertNil(sut.request.authScope)
