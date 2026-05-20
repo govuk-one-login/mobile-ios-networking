@@ -1,5 +1,3 @@
-import Foundation
-
 @available(*, deprecated, renamed: "AuthorizationProvider")
 typealias AuthenticationProvider = AuthorizationProvider
 
