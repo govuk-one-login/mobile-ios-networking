@@ -1,4 +1,3 @@
-import Foundation
 @testable import Networking
 
 final class MockAuthorizationProvider: AuthorizationProvider {
