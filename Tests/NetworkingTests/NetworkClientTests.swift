@@ -116,7 +116,7 @@ extension NetworkClientTests {
             (data, HTTPURLResponse(statusCode: 200))
         }
         // WHEN I make an attestation request
-        let returnedData = try await sut.request(.example).withAttestation().execute()
+        let returnedData = try await sut.request(.example).withClientAttestation().execute()
         XCTAssertEqual(returnedData, data)
         // THEN the attestation headers are attached
         let request = try XCTUnwrap(MockURLProtocol.requests.first)
@@ -154,7 +154,7 @@ extension NetworkClientTests {
             (data, HTTPURLResponse(statusCode: 200))
         }
         // WHEN I make a request with multiple headers
-        let returnedData = try await sut.request(.example).withAuthentication(scope: "testScope").withAttestation().withDPoP().execute()
+        let returnedData = try await sut.request(.example).withAuthentication(scope: "testScope").withClientAttestation().withDPoP().execute()
         XCTAssertEqual(returnedData, data)
         // THEN all the headers are attached
         let request = try XCTUnwrap(MockURLProtocol.requests.first)

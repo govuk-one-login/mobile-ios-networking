@@ -44,7 +44,7 @@ public final class NetworkClient: NetworkClientProtocol {
     /// `makeRequest` method for making network requests has a single parameter of type `NetworkRequest` and returns `Data`
     ///  Meant to be used through the .execute() function and not to be called directly
     ///  Example:
-    ///  networkClient.request(URLRequest).withAuthentication().withAttestation().withDPoP().execute()
+    ///  networkClient.request(URLRequest).withAuthentication().withClientAttestation().withDPoP().execute()
     ///
     /// - Parameters:
     ///   - request: ``NetworkRequest`` for the network request
@@ -89,8 +89,8 @@ public final class NetworkClient: NetworkClientProtocol {
                 assertionFailure("Client attestation provider not present")
                 throw NetworkClientError.clientAttestationProviderNotPresent
             }
-            let attestationParameters = try await clientAttestationProvider.fetchClientAttestation()
-            urlRequest = urlRequest.clientAttestation(with: attestationParameters)
+            let attestationHeaders = try await clientAttestationProvider.fetchClientAttestation()
+            urlRequest = urlRequest.setHeaderValues(attestationHeaders)
         }
         
         /// Set DPoP if present
@@ -99,8 +99,8 @@ public final class NetworkClient: NetworkClientProtocol {
                 assertionFailure("Client attestation provider not present")
                 throw NetworkClientError.clientAttestationProviderNotPresent
             }
-            let dPoP = try clientAttestationProvider.fetchDPoP()
-            urlRequest = urlRequest.dPoPAssertion(with: dPoP)
+            let dPoPHeaders = try clientAttestationProvider.fetchDPoP()
+            urlRequest = urlRequest.setHeaderValues(dPoPHeaders)
         }
         
         return urlRequest

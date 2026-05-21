@@ -44,7 +44,7 @@ extension RequestBuilderTests {
         XCTAssertFalse(sut.request.requiresClientAttestation)
         
         // Make sure request has an authscope
-        let newSut = sut.withAttestation()
+        let newSut = sut.withClientAttestation()
         XCTAssertTrue(newSut.request.requiresClientAttestation)
         XCTAssertFalse(newSut.request.requiresDPoP)
     }
@@ -74,7 +74,7 @@ extension RequestBuilderTests {
         
         let requestBuilder = sut
             .withAuthentication(scope: "testAuth")
-            .withAttestation()
+            .withClientAttestation()
             .withDPoP()
         
         // Make sure request has all the set parameters
