@@ -4,6 +4,6 @@ import Foundation
 public struct NetworkRequest {
     public var urlRequest: URLRequest
     public var authScope: String?
-    public var requiresClientAttestations: Bool = false
+    public var requiresClientAttestation: Bool = false
     public var requiresDPoP: Bool = false
 }

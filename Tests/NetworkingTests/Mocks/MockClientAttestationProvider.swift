@@ -2,7 +2,7 @@ import Foundation
 @testable import Networking
 
 final class MockClientAttestationProvider: ClientAttestationProvider {
-    func fetchClientAttestations() async throws -> [String: String] {
+    func fetchClientAttestation() async throws -> [String: String] {
         return ["Test-Client-Attestation": "12345",
                 "Test-Client-Attestation-PoP": "12345"]
     }

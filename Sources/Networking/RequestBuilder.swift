@@ -16,7 +16,7 @@ public final class RequestBuilder {
     }
     
     public func withAttestation() -> RequestBuilder {
-        request.requiresClientAttestations = true
+        request.requiresClientAttestation = true
         return self
     }
     

@@ -84,12 +84,12 @@ public final class NetworkClient: NetworkClientProtocol {
         }
         
         /// Set client attestation if present
-        if request.requiresClientAttestations {
+        if request.requiresClientAttestation {
             guard let clientAttestationProvider else {
                 assertionFailure("Client attestation provider not present")
                 throw NetworkClientError.clientAttestationProviderNotPresent
             }
-            let attestationParameters = try await clientAttestationProvider.fetchClientAttestations()
+            let attestationParameters = try await clientAttestationProvider.fetchClientAttestation()
             urlRequest = urlRequest.clientAttestation(with: attestationParameters)
         }
         

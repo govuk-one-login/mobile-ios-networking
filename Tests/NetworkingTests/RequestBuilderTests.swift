@@ -41,11 +41,11 @@ extension RequestBuilderTests {
     
     func test_attestation_request() {
         // No auth scope set by default
-        XCTAssertFalse(sut.request.requiresClientAttestations)
+        XCTAssertFalse(sut.request.requiresClientAttestation)
         
         // Make sure request has an authscope
         let newSut = sut.withAttestation()
-        XCTAssertTrue(newSut.request.requiresClientAttestations)
+        XCTAssertTrue(newSut.request.requiresClientAttestation)
         XCTAssertFalse(newSut.request.requiresDPoP)
     }
     
@@ -56,7 +56,7 @@ extension RequestBuilderTests {
         // Make sure request has an authscope
         let newSut = sut.withDPoP()
         XCTAssertTrue(newSut.request.requiresDPoP)
-        XCTAssertFalse(newSut.request.requiresClientAttestations)
+        XCTAssertFalse(newSut.request.requiresClientAttestation)
     }
     
     func test_execute_request() async throws {
@@ -68,7 +68,7 @@ extension RequestBuilderTests {
     }
     
     func test_example_call() {
-        XCTAssertFalse(sut.request.requiresClientAttestations)
+        XCTAssertFalse(sut.request.requiresClientAttestation)
         XCTAssertFalse(sut.request.requiresDPoP)
         XCTAssertNil(sut.request.authScope)
         
@@ -78,7 +78,7 @@ extension RequestBuilderTests {
             .withDPoP()
         
         // Make sure request has all the set parameters
-        XCTAssertTrue(requestBuilder.request.requiresClientAttestations)
+        XCTAssertTrue(requestBuilder.request.requiresClientAttestation)
         XCTAssertTrue(requestBuilder.request.requiresDPoP)
         XCTAssertEqual(requestBuilder.request.authScope, "testAuth")
     }
