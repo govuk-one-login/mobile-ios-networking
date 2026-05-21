@@ -67,11 +67,9 @@ extension NetworkClientTests {
         let firstResponse = try await sut.request(.example).execute()
         XCTAssertEqual(firstResponse, firstData)
         
-        
         let secondData = Data("{ testResult \(Date())}".utf8)
         
         MockURLProtocol.handler = {
-            
             (secondData, HTTPURLResponse(statusCode: 200))
         }
         
@@ -88,6 +86,7 @@ extension NetworkClientTests {
             _ = try await sut.request(.example).execute()
         } catch {
             XCTAssert(error is ServerError)
+            XCTAssertEqual((error as? ServerError)?.errorCode, 404)
         }
     }
     
@@ -186,11 +185,9 @@ extension NetworkClientTests {
         let firstResponse = try await sut.makeRequest(.example)
         XCTAssertEqual(firstResponse, firstData)
         
-        
         let secondData = Data("{ testResult \(Date())}".utf8)
         
         MockURLProtocol.handler = {
-            
             (secondData, HTTPURLResponse(statusCode: 200))
         }
         

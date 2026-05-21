@@ -50,7 +50,7 @@ public final class NetworkClient: NetworkClientProtocol {
     ///   - request: ``NetworkRequest`` for the network request
     /// - Returns: ``Data`` the response data from the endpoint
     public func makeRequest(_ request: NetworkRequest) async throws -> Data {
-        let urlRequest = try await setUp(request: request)
+        let urlRequest = try await configureRequestHeaders(for: request)
  
         let (data, response) = try await session.data(for: urlRequest)
         
@@ -70,7 +70,7 @@ public final class NetworkClient: NetworkClientProtocol {
         return data
     }
     
-    private func setUp(request: NetworkRequest) async throws -> URLRequest {
+    private func configureRequestHeaders(for request: NetworkRequest) async throws -> URLRequest {
         var urlRequest = request.urlRequest
         
         /// Set auth scope if present
@@ -79,8 +79,7 @@ public final class NetworkClient: NetworkClientProtocol {
                 assertionFailure("Authorization provider not present")
                 throw NetworkClientError.authorizationProviderNotPresent
             }
-            let authorizationToken = try await authorizationProvider
-                .fetchToken(withScope: scope)
+            let authorizationToken = try await authorizationProvider.fetchToken(withScope: scope)
             urlRequest = urlRequest.authorized(with: authorizationToken)
         }
         

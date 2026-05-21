@@ -6,9 +6,10 @@ public protocol NetworkClientProtocol {
     func makeRequest(_ request: NetworkRequest) async throws -> Data
 }
 
-/// Provide implementation so that we don't have to repeat it on each NetworkClient
+/// Default implementation so that it's not repeated on each NetworkClient wrapper
 extension NetworkClientProtocol {
-    /// Enables building a request that the builder can modify
+    /// Accepts a URLRequest and creates a RequestBuilder with reference to the NetworkClient itself.
+    /// The builder makes a NetworkRequest it can modify further, which will be used by makeRequest(), invoked from the .execute() on the builder.
     public func request(_ request: URLRequest) -> RequestBuilder {
         RequestBuilder(client: self, request: request)
     }
