@@ -30,6 +30,7 @@ final class NetworkClientTests: XCTestCase {
         sut = nil
         clientAttestationProvider = nil
         authorizationProvider = nil
+        dPoPProvider = nil
         MockURLProtocol.clear()
         
         super.tearDown()
