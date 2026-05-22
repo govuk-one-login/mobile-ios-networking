@@ -8,6 +8,7 @@ import Foundation
 public final class NetworkClient: NetworkClientProtocol {
     public var authorizationProvider: AuthorizationProvider?
     public var clientAttestationProvider: ClientAttestationProvider?
+    public var dPoPProvider: DPoPProvider?
     
     private let session: URLSession
     
@@ -73,7 +74,7 @@ public final class NetworkClient: NetworkClientProtocol {
     private func configureRequestHeaders(for request: NetworkRequest) async throws -> URLRequest {
         var urlRequest = request.urlRequest
         
-        /// Set auth scope if present
+        /// Add authorization header if auth scope provided
         if let scope = request.authScope {
             guard let authorizationProvider else {
                 assertionFailure("Authorization provider not present")
@@ -83,7 +84,7 @@ public final class NetworkClient: NetworkClientProtocol {
             urlRequest = urlRequest.authorized(with: authorizationToken)
         }
         
-        /// Set client attestation if present
+        /// Add client attestation headers if required
         if request.requiresClientAttestation {
             guard let clientAttestationProvider else {
                 assertionFailure("Client attestation provider not present")
@@ -93,13 +94,13 @@ public final class NetworkClient: NetworkClientProtocol {
             urlRequest = urlRequest.setHeaderValues(attestationHeaders)
         }
         
-        /// Set DPoP if present
+        /// Add DPoP header if required
         if request.requiresDPoP {
-            guard let clientAttestationProvider else {
-                assertionFailure("Client attestation provider not present")
-                throw NetworkClientError.clientAttestationProviderNotPresent
+            guard let dPoPProvider else {
+                assertionFailure("DPoP provider not present")
+                throw NetworkClientError.dPoPProviderNotPresent
             }
-            let dPoPHeaders = try clientAttestationProvider.fetchDPoP()
+            let dPoPHeaders = try dPoPProvider.fetchDPoP()
             urlRequest = urlRequest.setHeaderValues(dPoPHeaders)
         }
         

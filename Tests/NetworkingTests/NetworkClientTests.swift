@@ -8,6 +8,7 @@ final class NetworkClientTests: XCTestCase {
 
     private var authorizationProvider: MockAuthorizationProvider!
     private var clientAttestationProvider: MockClientAttestationProvider!
+    private var dPoPProvider: MockDPoPProvider!
 
     override func setUp() {
         super.setUp()
@@ -17,10 +18,12 @@ final class NetworkClientTests: XCTestCase {
 
         authorizationProvider = MockAuthorizationProvider()
         clientAttestationProvider = MockClientAttestationProvider()
+        dPoPProvider = MockDPoPProvider()
 
         sut = .init(configuration: configuration)
         sut.authorizationProvider = authorizationProvider
         sut.clientAttestationProvider = clientAttestationProvider
+        sut.dPoPProvider = dPoPProvider
     }
     
     override func tearDown() {
