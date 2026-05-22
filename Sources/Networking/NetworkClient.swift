@@ -100,7 +100,7 @@ public final class NetworkClient: NetworkClientProtocol {
                 assertionFailure("DPoP provider not present")
                 throw NetworkClientError.dPoPProviderNotPresent
             }
-            let dPoPHeaders = try dPoPProvider.fetchDPoP()
+            let dPoPHeaders = try await dPoPProvider.fetchDPoP()
             urlRequest = urlRequest.setHeaderValues(dPoPHeaders)
         }
         
