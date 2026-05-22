@@ -1,5 +1,4 @@
-import Foundation
-
+// TODO: DCMAW-20369 Remove deprecated typealias
 @available(*, deprecated, renamed: "AuthorizationProvider")
 typealias AuthenticationProvider = AuthorizationProvider
 
