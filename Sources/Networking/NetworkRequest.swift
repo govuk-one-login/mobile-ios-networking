@@ -4,6 +4,18 @@ import Foundation
 public struct NetworkRequest {
     public var urlRequest: URLRequest
     public var authScope: String?
-    public var requiresClientAttestation: Bool = false
-    public var requiresDPoP: Bool = false
+    public var requiresClientAttestation: Bool
+    public var requiresDPoP: Bool
+    
+    public init(
+        urlRequest: URLRequest,
+        authScope: String? = nil,
+        requiresClientAttestation: Bool = false,
+        requiresDPoP: Bool = false
+    ) {
+        self.urlRequest = urlRequest
+        self.authScope = authScope
+        self.requiresClientAttestation = requiresClientAttestation
+        self.requiresDPoP = requiresDPoP
+    }
 }
