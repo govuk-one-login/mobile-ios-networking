@@ -21,4 +21,32 @@ struct ServerErrorTests {
         
         #expect(nsError.errorCode == 200)
     }
+
+    @Test("errorUserInfo includes response data when present")
+    func errorUserInfoIncludesResponse() throws {
+        // GIVEN: a ServerError with response data
+        let responseData = Data("""
+        {"error": "invalid_client"}
+        """.utf8)
+        let sut = ServerError(endpoint: "token", errorCode: 400, response: responseData)
+
+        // WHEN: accessing userInfo via NSError bridging
+        let nsError = sut as NSError
+
+        // THEN: the response data is accessible
+        let retrieved = try #require(nsError.userInfo["response"] as? Data)
+        #expect(retrieved == responseData)
+    }
+
+    @Test("errorUserInfo is empty when response is nil")
+    func errorUserInfoEmptyWhenNoResponse() {
+        // GIVEN: a ServerError without response data
+        let sut = ServerError(endpoint: "token", errorCode: 500)
+
+        // WHEN: accessing userInfo via NSError bridging
+        let nsError = sut as NSError
+
+        // THEN: userInfo has no response key
+        #expect(nsError.userInfo["response"] == nil)
+    }
 }
