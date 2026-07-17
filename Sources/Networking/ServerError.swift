@@ -18,4 +18,12 @@ public struct ServerError: ErrorWithCode {
     }
 }
 
-extension ServerError: CustomNSError {}
+extension ServerError: CustomNSError {
+    public var errorUserInfo: [String: Any] {
+        var info: [String: Any] = [:]
+        if let response {
+            info["response"] = response
+        }
+        return info
+    }
+}
