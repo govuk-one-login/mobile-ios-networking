@@ -17,4 +17,4 @@ public enum AppIntegrityErrorKind: Int, GDSErrorKind {
     }
 }
 
-public typealias AppIntegrityError = NetworkingGDSError<AppIntegrityErrorKind>
+public typealias AppIntegrityError = NetworkingError<AppIntegrityErrorKind>

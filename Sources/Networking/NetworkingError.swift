@@ -1,6 +1,6 @@
 import GDSUtilities
 
-public struct NetworkingGDSError<Kind: GDSErrorKind>: GDSError {
+public struct NetworkingError<Kind: GDSErrorKind>: GDSError {
     public let kind: Kind
     public let reason: String?
     public let endpoint: String?
