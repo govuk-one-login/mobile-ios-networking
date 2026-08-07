@@ -10,8 +10,15 @@ let package = Package(
         .library(name: "MockNetworking", targets: ["MockNetworking"]),
         .library(name: "TokenGeneration", targets: ["TokenGeneration"])
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/govuk-one-login/mobile-ios-utilities",
+            from: "1.0.0"
+        )
+    ],
     targets: [
         .target(name: "Networking",
+                dependencies: [.product(name: "GDSUtilities", package: "mobile-ios-utilities")],
                 swiftSettings: [
                     .define("DEBUG", .when(configuration: .debug))
                 ]),
