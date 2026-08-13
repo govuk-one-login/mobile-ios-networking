@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/govuk-one-login/mobile-ios-utilities",
-            from: "1.0.0"
+            from: "2.0.0"
         )
     ],
     targets: [
