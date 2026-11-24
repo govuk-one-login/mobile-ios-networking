@@ -1,7 +1,7 @@
 import Foundation
 
 /// Enables the NetworkClient and RequestBuilder to work together
-public struct NetworkRequest {
+public struct NetworkRequest: Sendable {
     public var urlRequest: URLRequest
     public var authScope: String?
     public var requiresClientAttestation: Bool = false

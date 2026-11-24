@@ -1,7 +1,7 @@
 import Foundation
 
 /// Provides helper methods for constructing requests
-public final class RequestBuilder {
+public actor RequestBuilder {
     private var networkClient: NetworkClientProtocol
     var request: NetworkRequest
     

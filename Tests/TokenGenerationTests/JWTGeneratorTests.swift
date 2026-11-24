@@ -34,12 +34,12 @@ struct JWTGeneratorTests {
     
     @Test
     func generateJWTWithBaseTypes() throws {
-        let header: [String: Any] = [
+        let header: [String: any Sendable] = [
             "header_key_1": "header_value_1",
             "header_key_2": 123456789,
             "header_key_3": true
         ]
-        let payload: [String: Any] = [
+        let payload: [String: any Sendable] = [
             "payload_key_1": "payload_value_1",
             "payload_key_2": 987654321,
             "payload_key_3": false
@@ -70,11 +70,11 @@ struct JWTGeneratorTests {
     @Test
     func generateJWTWithCustomImplementation() throws {
         struct Content: JWTContent {
-            var header: [String: Any] {
+            var header: [String: any Sendable] {
                 ["header_key_1": "header_value_1"]
             }
 
-            var payload: [String: Any] {
+            var payload: [String: any Sendable] {
                 ["payload_key_1": "payload_value_1"]
             }
         }

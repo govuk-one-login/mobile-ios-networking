@@ -1,7 +1,7 @@
 import Foundation
 
 /// Make sure all NetworkClient Wrappers extend this protocol
-public protocol NetworkClientProtocol {
+public protocol NetworkClientProtocol: Sendable {
     func request(_ request: URLRequest) -> RequestBuilder
     func makeRequest(_ request: NetworkRequest) async throws -> Data
 }
