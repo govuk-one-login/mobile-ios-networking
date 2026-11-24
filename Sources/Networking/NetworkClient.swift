@@ -25,6 +25,35 @@ public final class NetworkClient: NetworkClientProtocol {
         self.init(configuration: config)
     }
     
+    /// Creates a client that stores responses in the given cache instead of `URLCache.shared`.
+    ///
+    /// Use this to keep a set of responses (for example certificate revocation lists) in a cache
+    /// that other app traffic cannot evict from, and whose capacity and location you control.
+    /// The caller keeps its own reference to `urlCache`, so it can also inspect stored responses
+    /// without making a request.
+    ///
+    /// Requests use `.useProtocolCachePolicy`, so the server's HTTP caching headers decide
+    /// whether a stored response is reused or revalidated. Set a different `cachePolicy` on an
+    /// individual `URLRequest` to override this.
+    ///
+    /// A disk cache does not store a single response larger than roughly 5% of its
+    /// `diskCapacity`, so size it well above the largest response you expect.
+    ///
+    /// - Parameters:
+    ///   - urlCache: The cache to store responses in.
+    public convenience init(urlCache: URLCache) {
+        self.init(configuration: Self.configuration(urlCache: urlCache))
+    }
+    
+    /// Builds the session configuration used by ``init(urlCache:)``. Separate from the
+    /// initialiser so tests can add a mock `URLProtocol` to it.
+    static func configuration(urlCache: URLCache) -> URLSessionConfiguration {
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .useProtocolCachePolicy
+        config.urlCache = urlCache
+        return config
+    }
+    
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.
     ///
     /// For iOS 14 and later, certificates are pinned using `NSAppTransportSecurity`.
