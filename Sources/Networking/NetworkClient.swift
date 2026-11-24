@@ -3,13 +3,27 @@ import UIKit
 
 /// NetworkClient
 ///
-/// `NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
+/// `NetworkClient` is an actor with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
 ///
 ///  NetworkClient wrappers need to extend NetworkClientProtocol so that the execute() on the builder goes through the makeRequest they are implementing.
-public final class NetworkClient: NetworkClientProtocol {
-    public var authorizationProvider: AuthorizationProvider?
-    public var clientAttestationProvider: ClientAttestationProvider?
-    public var dPoPProvider: DPoPProvider?
+public actor NetworkClient: NetworkClientProtocol {
+    private var _authorizationProvider: AuthorizationProvider?
+    private var _clientAttestationProvider: ClientAttestationProvider?
+    private var _dPoPProvider: DPoPProvider?
+    
+    public var authorizationProvider: AuthorizationProvider? { _authorizationProvider }
+    public var clientAttestationProvider: ClientAttestationProvider? { _clientAttestationProvider }
+    public var dPoPProvider: DPoPProvider? { _dPoPProvider }
+
+    public func set(authorizationProvider: AuthorizationProvider?) {
+        _authorizationProvider = authorizationProvider
+    }
+    public func set(clientAttestationProvider: ClientAttestationProvider?) {
+        _clientAttestationProvider = clientAttestationProvider
+    }
+    public func set(dPoPProvider: DPoPProvider?) {
+        _dPoPProvider = dPoPProvider
+    }
     
     private let session: URLSession
     
@@ -21,7 +35,7 @@ public final class NetworkClient: NetworkClientProtocol {
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
     @MainActor
-    public convenience init() {
+    public init() {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
         self.init(configuration: config)
