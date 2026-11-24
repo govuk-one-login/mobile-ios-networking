@@ -3,6 +3,7 @@ import Foundation
 /// MockURLProtocol
 ///
 /// Used for mocking a url response for unit testing.
+@MainActor
 public final class MockURLProtocol: URLProtocol {
     enum MockURLProtocolError: String, Error {
         case noHandlerSet = "⚠️ Remember to set a handler closure when using MockURLProtocol"
@@ -26,7 +27,11 @@ public final class MockURLProtocol: URLProtocol {
     }
     
     public override static func canInit(with request: URLRequest) -> Bool {
-        requests.append(request)
+        Task {
+            await MainActor.run {
+                requests.append(request)
+            }
+        }
         return true
     }
     

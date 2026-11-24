@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// NetworkClient
 ///
@@ -19,6 +20,7 @@ public final class NetworkClient: NetworkClientProtocol {
     #endif
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
+    @MainActor
     public convenience init() {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
@@ -33,9 +35,10 @@ public final class NetworkClient: NetworkClientProtocol {
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
     ///
+    @MainActor
     init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
-        configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
+        configuration.httpAdditionalHeaders = ["User-Agent": UserAgent(device: UIDevice.current).description]
         #if DEBUG
         print(configuration.httpAdditionalHeaders!)
         #endif
