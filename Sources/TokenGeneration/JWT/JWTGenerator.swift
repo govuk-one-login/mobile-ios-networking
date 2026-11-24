@@ -1,6 +1,6 @@
 import Foundation.NSData
 
-public struct JWTGenerator {
+public struct JWTGenerator: Sendable {
     private let jwtRepresentation: JWTContent
     private let signingService: JWTSigningService
     
