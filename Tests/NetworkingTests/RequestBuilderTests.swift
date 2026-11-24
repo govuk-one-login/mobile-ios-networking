@@ -4,8 +4,8 @@ import XCTest
 
 final class RequestBuilderTests: XCTestCase {
     // NetworkClient Mock
-    private final class MockNetworkClient: NetworkClientProtocol {
-        var receivedRequest: NetworkRequest?
+    private actor MockNetworkClient: NetworkClientProtocol {
+        private(set) var receivedRequest: NetworkRequest?
         
         func makeRequest(_ request: NetworkRequest) async throws -> Data {
             receivedRequest = request
@@ -64,7 +64,8 @@ extension RequestBuilderTests {
 
         XCTAssertEqual(data, Data())
         // Make sure execute calls makeRequest on the NetworkClient its invoked
-        XCTAssertEqual(mockNetworkClient.receivedRequest?.urlRequest, URLRequest.example)
+        let receivedRequest = await mockNetworkClient.receivedRequest?.urlRequest
+        XCTAssertEqual(receivedRequest, URLRequest.example)
     }
     
     func test_example_call() {
@@ -72,10 +73,9 @@ extension RequestBuilderTests {
         XCTAssertFalse(sut.request.requiresDPoP)
         XCTAssertNil(sut.request.authScope)
         
-        let requestBuilder = sut
-            .withAuthentication(scope: "testAuth")
-            .withClientAttestation()
-            .withDPoP()
+        var requestBuilder = sut.withAuthentication(scope: "testAuth")
+        requestBuilder = requestBuilder.withClientAttestation()
+        requestBuilder = requestBuilder.withDPoP()
         
         // Make sure request has all the set parameters
         XCTAssertTrue(requestBuilder.request.requiresClientAttestation)

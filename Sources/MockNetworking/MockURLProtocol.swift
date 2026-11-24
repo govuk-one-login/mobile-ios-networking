@@ -39,6 +39,9 @@ public final class MockURLProtocol: URLProtocol {
         do {
             let handlerResult = try Self.handler()
             
+            // Can client? be non-nil? Protocol defines a get only
+            // and it cannot be set in the mock.
+            // Martin Nygren, November 2026
             client?.urlProtocol(self, didReceive: handlerResult.response, cacheStoragePolicy: .allowed)
             client?.urlProtocol(self, didLoad: handlerResult.data)
             client?.urlProtocolDidFinishLoading(self)
