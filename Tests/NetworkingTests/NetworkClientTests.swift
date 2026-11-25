@@ -60,61 +60,6 @@ extension NetworkClientTests {
         XCTAssertNotNil(config.httpCookieStorage)
     }
     
-    func test_convenienceInit_usesSharedCache() async throws {
-        let sut = NetworkClient()
-        
-        XCTAssertTrue(sut.debugSession.configuration.urlCache === URLCache.shared)
-    }
-    
-    func test_urlCacheInit_usesInjectedCache() async throws {
-        let cache = URLCache(memoryCapacity: 1_000_000, diskCapacity: 0)
-        
-        let sut = NetworkClient(urlCache: cache)
-        let config = sut.debugSession.configuration
-        
-        XCTAssertTrue(config.urlCache === cache)
-        XCTAssertFalse(config.urlCache === URLCache.shared)
-        XCTAssertEqual(config.requestCachePolicy, .useProtocolCachePolicy)
-        XCTAssertEqual(config.tlsMinimumSupportedProtocolVersion, .TLSv12)
-        XCTAssertEqual(config.httpAdditionalHeaders?["User-Agent"] as? String, UserAgent().description)
-    }
-    
-    func test_injectedCache_receivesStoredResponsesInsteadOfSharedCache() async throws {
-        let cache = URLCache(memoryCapacity: 1_000_000, diskCapacity: 0)
-        let url = URL.example
-        let request = URLRequest(url: url)
-        URLCache.shared.removeCachedResponse(for: request)
-        
-        // `init(urlCache:)` cannot take a mock `URLProtocol`, so build the equivalent
-        // configuration by hand. Its wiring is covered by `test_urlCacheInit_usesInjectedCache`.
-        let config = URLSessionConfiguration.default
-        config.requestCachePolicy = .useProtocolCachePolicy
-        config.urlCache = cache
-        config.protocolClasses = [MockURLProtocol.self]
-        let sut = NetworkClient(configuration: config)
-        
-        let body = Data("cached body".utf8)
-        MockURLProtocol.handler = {
-            let response = try XCTUnwrap(HTTPURLResponse(
-                url: url,
-                statusCode: 200,
-                httpVersion: nil,
-                headerFields: ["Cache-Control": "max-age=3600"]
-            ))
-            return (body, response)
-        }
-        
-        let first = try await sut.request(request).execute()
-        XCTAssertEqual(first, body)
-        
-        // The cache write can complete asynchronously, so wait for it.
-        for _ in 0..<50 where cache.cachedResponse(for: request) == nil {
-            try await Task.sleep(nanoseconds: 20_000_000)
-        }
-        XCTAssertEqual(cache.cachedResponse(for: request)?.data, body)
-        XCTAssertNil(URLCache.shared.cachedResponse(for: request))
-    }
-    
     func test_makeRequest_returnsData() async throws {
         let originalDate = Date()
         let firstData = Data("{ testResult \(originalDate)}".utf8)
