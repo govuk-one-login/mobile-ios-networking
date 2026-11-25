@@ -28,9 +28,10 @@ struct NetworkClientCacheTests {
     @Test("A client with an injected cache stores responses there and not in the shared cache")
     func test_injectedCache_receivesStoredResponsesInsteadOfSharedCache() async throws {
         let cache = URLCache(memoryCapacity: 1_000_000, diskCapacity: 0)
-        let url = URL.example
+        // A unique URL per run, so this test neither reads nor clears entries that other
+        // tests may have stored in the shared cache for a common URL such as `URL.example`.
+        let url = try #require(URL(string: "https://www.example.com/\(UUID().uuidString)"))
         let request = URLRequest(url: url)
-        URLCache.shared.removeCachedResponse(for: request)
         defer { MockURLProtocol.clear() }
 
         // `init(urlCache:)` cannot take a mock `URLProtocol`, so build the equivalent
@@ -53,10 +54,8 @@ struct NetworkClientCacheTests {
         let first = try await sut.request(request).execute()
         #expect(first == body)
 
-        // The cache write can complete asynchronously, so wait for it.
-        for _ in 0..<50 where cache.cachedResponse(for: request) == nil {
-            try await Task.sleep(nanoseconds: 20_000_000)
-        }
+        // The response is stored as part of the request, so it is in the cache by the time
+        // `execute()` returns.
         #expect(cache.cachedResponse(for: request)?.data == body)
         #expect(URLCache.shared.cachedResponse(for: request) == nil)
     }
