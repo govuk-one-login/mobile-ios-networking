@@ -4,7 +4,7 @@ import XCTest
 
 final class RequestBuilderTests: XCTestCase {
     // NetworkClient Mock
-    private final class MockNetworkClient: NetworkClientProtocol {
+    private actor MockNetworkClient: NetworkClientProtocol {
         var receivedRequest: NetworkRequest?
         
         func makeRequest(_ request: NetworkRequest) async throws -> Data {
@@ -30,33 +30,41 @@ final class RequestBuilderTests: XCTestCase {
 }
 
 extension RequestBuilderTests {
-    func test_authentication_request() {
+    func test_authentication_request() async {
         // No auth scope set by default
-        XCTAssertNil(sut.request.authScope)
+        let initialAuthScope = await sut.request.authScope
+        XCTAssertNil(initialAuthScope)
         
         // Make sure request has an authscope
-        let newSut = sut.withAuthentication(scope: "test_auth_scope")
-        XCTAssertEqual(newSut.request.authScope, "test_auth_scope")
+        let newSut = await sut.withAuthentication(scope: "test_auth_scope")
+        let authScope = await newSut.request.authScope
+        XCTAssertEqual(authScope, "test_auth_scope")
     }
     
-    func test_attestation_request() {
-        // No auth scope set by default
-        XCTAssertFalse(sut.request.requiresClientAttestation)
+    func test_attestation_request() async {
+        // Client attestation is not required by default
+        let initialRequiresClientAttestation = await sut.request.requiresClientAttestation
+        XCTAssertFalse(initialRequiresClientAttestation)
         
-        // Make sure request has an authscope
-        let newSut = sut.withClientAttestation()
-        XCTAssertTrue(newSut.request.requiresClientAttestation)
-        XCTAssertFalse(newSut.request.requiresDPoP)
+        // Make sure request requires client attestation
+        let newSut = await sut.withClientAttestation()
+        let requiresClientAttestation = await newSut.request.requiresClientAttestation
+        let requiresDPoP = await newSut.request.requiresDPoP
+        XCTAssertTrue(requiresClientAttestation)
+        XCTAssertFalse(requiresDPoP)
     }
     
-    func test_dPoP_request() {
-        // No auth scope set by default
-        XCTAssertFalse(sut.request.requiresDPoP)
+    func test_dPoP_request() async {
+        // DPoP is not required by default
+        let initialRequiresDPoP = await sut.request.requiresDPoP
+        XCTAssertFalse(initialRequiresDPoP)
         
-        // Make sure request has an authscope
-        let newSut = sut.withDPoP()
-        XCTAssertTrue(newSut.request.requiresDPoP)
-        XCTAssertFalse(newSut.request.requiresClientAttestation)
+        // Make sure request requires DPoP
+        let newSut = await sut.withDPoP()
+        let requiresDPoP = await newSut.request.requiresDPoP
+        let requiresClientAttestation = await newSut.request.requiresClientAttestation
+        XCTAssertTrue(requiresDPoP)
+        XCTAssertFalse(requiresClientAttestation)
     }
     
     func test_execute_request() async throws {
@@ -64,22 +72,29 @@ extension RequestBuilderTests {
 
         XCTAssertEqual(data, Data())
         // Make sure execute calls makeRequest on the NetworkClient its invoked
-        XCTAssertEqual(mockNetworkClient.receivedRequest?.urlRequest, URLRequest.example)
+        let receivedRequest = await mockNetworkClient.receivedRequest?.urlRequest
+        XCTAssertEqual(receivedRequest, URLRequest.example)
     }
     
-    func test_example_call() {
-        XCTAssertFalse(sut.request.requiresClientAttestation)
-        XCTAssertFalse(sut.request.requiresDPoP)
-        XCTAssertNil(sut.request.authScope)
+    func test_example_call() async {
+        let initialRequiresClientAttestation = await sut.request.requiresClientAttestation
+        let initialRequiresDPoP = await sut.request.requiresDPoP
+        let initialAuthScope = await sut.request.authScope
+        XCTAssertFalse(initialRequiresClientAttestation)
+        XCTAssertFalse(initialRequiresDPoP)
+        XCTAssertNil(initialAuthScope)
         
-        let requestBuilder = sut
+        let requestBuilder = await sut
             .withAuthentication(scope: "testAuth")
             .withClientAttestation()
             .withDPoP()
         
         // Make sure request has all the set parameters
-        XCTAssertTrue(requestBuilder.request.requiresClientAttestation)
-        XCTAssertTrue(requestBuilder.request.requiresDPoP)
-        XCTAssertEqual(requestBuilder.request.authScope, "testAuth")
+        let requiresClientAttestation = await requestBuilder.request.requiresClientAttestation
+        let requiresDPoP = await requestBuilder.request.requiresDPoP
+        let authScope = await requestBuilder.request.authScope
+        XCTAssertTrue(requiresClientAttestation)
+        XCTAssertTrue(requiresDPoP)
+        XCTAssertEqual(authScope, "testAuth")
     }
 }

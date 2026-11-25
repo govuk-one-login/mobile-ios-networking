@@ -3,7 +3,7 @@ import UIKit
 /// UserAgent
 ///
 /// A type to collect and structure user and device data to send in the HTTP header `User-Agent` parameter.
-struct UserAgent: CustomStringConvertible, Sendable {
+struct UserAgent: CustomStringConvertible {
     
     private let app: AppBundle
     private let deviceModel: String
