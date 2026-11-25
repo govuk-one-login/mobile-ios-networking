@@ -42,16 +42,10 @@ public final class NetworkClient: NetworkClientProtocol {
     /// - Parameters:
     ///   - urlCache: The cache to store responses in.
     public convenience init(urlCache: URLCache) {
-        self.init(configuration: Self.configuration(urlCache: urlCache))
-    }
-    
-    /// Builds the session configuration used by ``init(urlCache:)``. Separate from the
-    /// initialiser so tests can add a mock `URLProtocol` to it.
-    static func configuration(urlCache: URLCache) -> URLSessionConfiguration {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
         config.urlCache = urlCache
-        return config
+        self.init(configuration: config)
     }
     
     /// Initialiser sets the `URLSessionConfiguration` and certificate pinning.

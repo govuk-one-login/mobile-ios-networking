@@ -79,13 +79,17 @@ extension NetworkClientTests {
         XCTAssertEqual(config.httpAdditionalHeaders?["User-Agent"] as? String, UserAgent().description)
     }
     
-    func test_urlCacheInit_storesResponsesInInjectedCacheOnly() async throws {
+    func test_injectedCache_receivesStoredResponsesInsteadOfSharedCache() async throws {
         let cache = URLCache(memoryCapacity: 1_000_000, diskCapacity: 0)
         let url = URL.example
         let request = URLRequest(url: url)
         URLCache.shared.removeCachedResponse(for: request)
         
-        let config = NetworkClient.configuration(urlCache: cache)
+        // `init(urlCache:)` cannot take a mock `URLProtocol`, so build the equivalent
+        // configuration by hand. Its wiring is covered by `test_urlCacheInit_usesInjectedCache`.
+        let config = URLSessionConfiguration.default
+        config.requestCachePolicy = .useProtocolCachePolicy
+        config.urlCache = cache
         config.protocolClasses = [MockURLProtocol.self]
         let sut = NetworkClient(configuration: config)
         
