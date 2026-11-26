@@ -61,7 +61,7 @@ public final class MockURLProtocol: URLProtocol, @unchecked Sendable {
 }
 
 extension URLSessionConfiguration {
-    func withMockURLProtocol() -> URLSessionConfiguration {
+    public func withMockURLProtocol() -> URLSessionConfiguration {
         protocolClasses = [MockURLProtocol.self]
         return self
     }

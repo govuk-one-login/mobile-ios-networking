@@ -13,15 +13,13 @@ final class NetworkClientTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
         
-        let testConfiguration = URLSessionConfiguration.default
-        configuration = testConfiguration
-        configuration.protocolClasses = [MockURLProtocol.self]
+        configuration = URLSessionConfiguration.default.withMockURLProtocol()
 
         authorizationProvider = MockAuthorizationProvider()
         clientAttestationProvider = MockClientAttestationProvider()
         dPoPProvider = MockDPoPProvider()
 
-        sut = await MainActor.run { .init(configuration: testConfiguration) }
+        sut = await MainActor.run { [configuration] in .init(configuration: configuration) }
         sut.authorizationProvider = authorizationProvider
         sut.clientAttestationProvider = clientAttestationProvider
         sut.dPoPProvider = dPoPProvider
@@ -46,8 +44,7 @@ extension NetworkClientTests {
     }
     
     func test_initialisation_UsesProtocolCachePolicy() async throws {
-        let configuration = URLSessionConfiguration.default
-        configuration.protocolClasses = [MockURLProtocol.self]
+        let configuration = URLSessionConfiguration.default.withMockURLProtocol()
         
         _ = await MainActor.run { NetworkClient(configuration: configuration) }
         
@@ -67,30 +64,25 @@ extension NetworkClientTests {
         let originalDate = Date()
         let firstData = Data("{ testResult \(originalDate)}".utf8)
         
-        await MainActor.run {
-            MockURLProtocol.handler = { (firstData, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (firstData, HTTPURLResponse(statusCode: 200)) }
         
         let firstResponse = try await sut.request(.example).execute()
         XCTAssertEqual(firstResponse, firstData)
         
         let secondData = Data("{ testResult \(Date())}".utf8)
         
-        await MainActor.run {
-            MockURLProtocol.handler = { (secondData, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (secondData, HTTPURLResponse(statusCode: 200)) }
         
         let secondResponse = try await sut.request(.example).execute()
         XCTAssertEqual(secondResponse, secondData)
     }
     
     func test_makeRequest_returnsServerError() async throws {
-        await MainActor.run {
-            MockURLProtocol.handler = { (Data(), HTTPURLResponse(statusCode: 404)) }
-        }
+        MockURLProtocol.handler = { (Data(), HTTPURLResponse(statusCode: 404)) }
         
         do {
             _ = try await sut.request(.example).execute()
+            XCTFail("ServerError should have been thrown")
         } catch {
             XCTAssert(error is ServerError)
             XCTAssertEqual((error as? ServerError)?.errorCode, 404)
@@ -100,9 +92,8 @@ extension NetworkClientTests {
     func test_makeAuthorizedRequest_attachesAuthorizationToken() async throws {
         // GIVEN I can connect to the backend server
         let data = Data("{ testResult }".utf8)
-        await MainActor.run {
-            MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
+
         // WHEN I make an authorized request
         let returnedData = try await sut.request(.example).withAuthentication(scope: "testScope").execute()
         XCTAssertEqual(returnedData, data)
@@ -110,7 +101,7 @@ extension NetworkClientTests {
         let fetchedTokenScope = await authorizationProvider.fetchedTokenScope
         XCTAssertEqual(fetchedTokenScope, "testScope")
         // AND the access token is attached
-        let requests = await MockURLProtocol.requests
+        let requests = MockURLProtocol.requests
         let request = try XCTUnwrap(requests.first)
         let bearerToken = request.value(forHTTPHeaderField: "Authorization")
         XCTAssertEqual(bearerToken, "Bearer testBearerToken")
@@ -122,14 +113,13 @@ extension NetworkClientTests {
     func test_makeAttestationRequest() async throws {
         // GIVEN I can connect to the backend server
         let data = Data("{ testResult }".utf8)
-        await MainActor.run {
-            MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
+
         // WHEN I make an attestation request
         let returnedData = try await sut.request(.example).withClientAttestation().execute()
         XCTAssertEqual(returnedData, data)
         // THEN the attestation headers are attached
-        let requests = await MockURLProtocol.requests
+        let requests = MockURLProtocol.requests
         let request = try XCTUnwrap(requests.first)
         let clientHeader = request.value(forHTTPHeaderField: "Test-Client-Attestation")
         XCTAssertEqual(clientHeader, "12345")
@@ -144,14 +134,13 @@ extension NetworkClientTests {
     func test_makeDPoPRequest() async throws {
         // GIVEN I can connect to the backend server
         let data = Data("{ testResult }".utf8)
-        await MainActor.run {
-            MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
+
         // WHEN I make a dPoP request
         let returnedData = try await sut.request(.example).withDPoP().execute()
         XCTAssertEqual(returnedData, data)
         // THEN the dPoP headers are attached
-        let requests = await MockURLProtocol.requests
+        let requests = MockURLProtocol.requests
         let request = try XCTUnwrap(requests.first)
         let dPoPHeader = request.value(forHTTPHeaderField: "Test-DPoP")
         XCTAssertEqual(dPoPHeader, "12345")
@@ -164,14 +153,13 @@ extension NetworkClientTests {
     func test_makeAuthAndAttestationRequest() async throws {
         // GIVEN I can connect to the backend server
         let data = Data("{ testResult }".utf8)
-        await MainActor.run {
-            MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
-        }
+        MockURLProtocol.handler = { (data, HTTPURLResponse(statusCode: 200)) }
+
         // WHEN I make a request with multiple headers
         let returnedData = try await sut.request(.example).withAuthentication(scope: "testScope").withClientAttestation().withDPoP().execute()
         XCTAssertEqual(returnedData, data)
         // THEN all the headers are attached
-        let requests = await MockURLProtocol.requests
+        let requests = MockURLProtocol.requests
         let request = try XCTUnwrap(requests.first)
         let dPoPHeader = request.value(forHTTPHeaderField: "Test-DPoP")
         XCTAssertEqual(dPoPHeader, "12345")
