@@ -1,11 +1,12 @@
 import Foundation
+import UIKit
 
 /// NetworkClient
 ///
 /// `NetworkClient` is a class with one public async throwing method called `makeRequest` which handles network requests and returns `Data`.
 ///
 ///  NetworkClient wrappers need to extend NetworkClientProtocol so that the execute() on the builder goes through the makeRequest they are implementing.
-public final class NetworkClient: NetworkClientProtocol {
+public struct NetworkClient: NetworkClientProtocol {
     public var authorizationProvider: AuthorizationProvider?
     public var clientAttestationProvider: ClientAttestationProvider?
     public var dPoPProvider: DPoPProvider?
@@ -19,7 +20,8 @@ public final class NetworkClient: NetworkClientProtocol {
     #endif
     
     /// Convenience initialiser that uses the `URLSessionConfiguration.default` singleton
-    public convenience init() {
+    @MainActor
+    public init() {
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .useProtocolCachePolicy
         self.init(configuration: config)
@@ -56,9 +58,10 @@ public final class NetworkClient: NetworkClientProtocol {
     /// - Parameters:
     ///   - configuration: URLSessionConfiguration
     ///
+    @MainActor
     init(configuration: URLSessionConfiguration) {
         configuration.tlsMinimumSupportedProtocolVersion = .TLSv12
-        configuration.httpAdditionalHeaders = ["User-Agent": UserAgent().description]
+        configuration.httpAdditionalHeaders = ["User-Agent": UserAgent(device: UIDevice.current).description]
         #if DEBUG
         print(configuration.httpAdditionalHeaders!)
         #endif

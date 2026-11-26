@@ -3,22 +3,31 @@ import Foundation
 /// MockURLProtocol
 ///
 /// Used for mocking a url response for unit testing.
-public final class MockURLProtocol: URLProtocol {
-    enum MockURLProtocolError: String, Error {
+public final class MockURLProtocol: URLProtocol, @unchecked Sendable {
+    private static let workQueue = DispatchQueue(label: "mock-url-protocol-work-queue")
+    enum MockURLProtocolError: String, Error, Sendable {
         case noHandlerSet = "⚠️ Remember to set a handler closure when using MockURLProtocol"
     }
     
-    public private(set) static var requests: [URLRequest] = []
-    public static var handler: (() throws -> (data: Data, response: URLResponse)) = defaultHandler
+    nonisolated(unsafe) private static var _requests: [URLRequest] = []
+    public static var requests: [URLRequest] {  workQueue.sync { _requests } }
     
-    static let defaultHandler: (() throws -> (Data, URLResponse)) = {
+    nonisolated(unsafe) private static var _handler: (() throws -> (data: Data, response: URLResponse)) = defaultHandler
+    public static var handler: (() throws -> (data: Data, response: URLResponse)) {
+        get { workQueue.sync { _handler } }
+        set { workQueue.sync { _handler = newValue } }
+    }
+    
+    nonisolated(unsafe) private static let defaultHandler: (() throws -> (Data, URLResponse)) = {
         assertionFailure(MockURLProtocolError.noHandlerSet.rawValue)
         throw MockURLProtocolError.noHandlerSet
     }
     
     public static func clear() {
-        requests = []
-        handler = defaultHandler
+        workQueue.sync {
+            _requests = []
+            _handler = defaultHandler
+        }
     }
     
     public override static func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -26,7 +35,10 @@ public final class MockURLProtocol: URLProtocol {
     }
     
     public override static func canInit(with request: URLRequest) -> Bool {
-        requests.append(request)
+        workQueue.sync {
+            _requests.append(request)
+        }
+
         return true
     }
     
@@ -45,5 +57,12 @@ public final class MockURLProtocol: URLProtocol {
     
     public override func stopLoading() {
         // This method is unused in the mock currently
+    }
+}
+
+extension URLSessionConfiguration {
+    public func withMockURLProtocol() -> URLSessionConfiguration {
+        protocolClasses = [MockURLProtocol.self]
+        return self
     }
 }

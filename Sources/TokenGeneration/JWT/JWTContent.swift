@@ -1,4 +1,4 @@
-public protocol JWTContent {
-    var header: [String: Any] { get }
-    var payload: [String: Any] { get }
+public protocol JWTContent: Sendable {
+    var header: [String: any Sendable] { get }
+    var payload: [String: any Sendable] { get }
 }

@@ -11,7 +11,7 @@ import Foundation
 /// This makes the `hash` property useful for error tracking and reporting via logging or analytics.
 ///
 /// Used by ``ServerError``
-public protocol ErrorWithCode: Error {
+public protocol ErrorWithCode: Error, Sendable {
     var hash: String? { get }
     var errorCode: Int { get }
     var endpoint: String? { get }

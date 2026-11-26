@@ -7,7 +7,8 @@ struct UserAgent: CustomStringConvertible {
     
     private let app: AppBundle
     private let deviceModel: String
-    private let device: Device
+    private let systemName: String
+    private let systemVersion: String
     private let cfApp: AppBundle?
     private let darwin: String
     
@@ -20,14 +21,16 @@ struct UserAgent: CustomStringConvertible {
     ///  - `device` of type `Device` and defaults to that returned from `UIDevice.current`
     ///  - `cfapp` of type optional `AppBundle` and defaults to that returned from `Bundle(identifier: "com.apple.CFNetwork")`
     ///  - `darwin` of type `String` and defaults to that returned from `DarwinVersion`
+    @MainActor
     init(app: AppBundle = Bundle.main,
          deviceModel: String = DeviceModel().description,
-         device: Device = UIDevice.current,
+         device: Device,
          cfapp: AppBundle? = Bundle(identifier: "com.apple.CFNetwork"),
          darwin: String = DarwinVersion().description) {
         self.app = app
         self.deviceModel = deviceModel
-        self.device = device
+        self.systemName = device.systemName
+        self.systemVersion = device.systemVersion
         self.cfApp = cfapp
         self.darwin = darwin
     }
@@ -59,7 +62,7 @@ struct UserAgent: CustomStringConvertible {
     
     // MARK: Creating the Device Version string
     private var osVersion: String {
-        return "\(device.systemName)/\(device.systemVersion)"
+        return "\(systemName)/\(systemVersion)"
     }
     
     // MARK: Creating the Network Version string

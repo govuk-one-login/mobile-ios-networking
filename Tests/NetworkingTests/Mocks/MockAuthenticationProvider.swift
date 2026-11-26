@@ -1,6 +1,6 @@
 @testable import Networking
 
-final class MockAuthorizationProvider: AuthorizationProvider {
+actor MockAuthorizationProvider: AuthorizationProvider {
     private(set) var fetchedTokenScope: String?
 
     func fetchToken(withScope scope: String) async throws -> String {

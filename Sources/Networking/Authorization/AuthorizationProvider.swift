@@ -1,4 +1,4 @@
 /// Protocol for passing a bearer token for authorization
-public protocol AuthorizationProvider {
+public protocol AuthorizationProvider: Sendable {
     func fetchToken(withScope scope: String) async throws -> String
 }
