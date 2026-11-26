@@ -78,6 +78,21 @@ public func makeAuthorizedRequest(exchangeRequest: URLRequest,
 
 Both of these methods handle various response types and return or throw errors as appropriate.
 
+##### Using a custom cache
+
+By default `NetworkClient()` caches responses in `URLCache.shared`, which is shared with all other traffic in the app. To keep a set of responses (for example certificate revocation lists) in a cache you control, pass your own `URLCache`:
+
+```swift
+let directory = FileManager.default
+    .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    .appendingPathComponent("CRLCache")
+let cache = URLCache(memoryCapacity: 1_000_000, diskCapacity: 20_000_000, directory: directory)
+
+let client = NetworkClient(urlCache: cache)
+```
+
+Requests use `.useProtocolCachePolicy`, so the server's HTTP caching headers decide whether a stored response is reused or revalidated. Keep a reference to the cache if you need to inspect stored responses without making a request. A disk cache does not store a single response larger than roughly 5% of its `diskCapacity`, so size it well above the largest response you expect.
+
 The `URLSessionConfiguration.tlsMinimumSupportedProtocolVersion` is then set to `.TLSv12` and `.httpAdditionalHeaders` is set like so:
 
 ```swift
